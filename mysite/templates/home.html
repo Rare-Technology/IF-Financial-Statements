@@ -1,0 +1,25 @@
+<!-- templates/home.html -->
+<!-- See https://learndjango.com/tutorials/django-login-and-logout-tutorial
+if you want to use the idea of having a "base" template from which the others extend
+upon. Something like having a banner at the top which shows on every page -->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset = "utf-8">
+  <title>{% block title %} Financial statements {% endblock %}</title>
+</head>
+<body>
+  <main>
+    {% block content %}
+    {% if user.is_authenticated %}
+      Hello, {{ user.username }} !
+      <p><a href="{% url 'logout' %}">Log out</a></p>
+    {% else %}
+      <p>You are not logged in.</p>
+      <a href="{% url 'login' %}">Click here to log in.</a>
+    {% endif %}
+    {% endblock %}
+  </main>
+</body>
+</html>
