@@ -11,13 +11,23 @@ upon. Something like having a banner at the top which shows on every page -->
 </head>
 <body>
   <main>
+    {% if messages %}
+      {% for message in messages %}
+        <div class = "alert alert-{{ messages.tags }}">
+          { message }
+        </div>
+      {% endfor %}
+    {% endif %}
     {% block content %}
     {% if user.is_authenticated %}
       Hello, {{ user.username }} !
+      <br>
+      <button type="button"><a href="{% url 'settings' %}">User settings</a></button>
       <p><a href="{% url 'logout' %}">Log out</a></p>
     {% else %}
-      <p>You are not logged in.</p>
-      <a href="{% url 'login' %}">Click here to log in.</a>
+      <p>You are not logged in. <a href="{% url 'login' %}">Click here to log in.</a></p>
+      <p>Don't have an account? <a href="{% url 'register' %}">Click here to create an account</a></p>
+
     {% endif %}
     {% endblock %}
   </main>
