@@ -17,7 +17,7 @@ def register(request):
     return render(request, 'registration/register.html', ctx)
 
 def settings(request):
-    return render(request, 'settings.html')
+    return render(request, 'mysite/settings.html')
 
 def home(request):
-    return render(request, 'home.html')
+    return render(request, 'mysite/home.html')
