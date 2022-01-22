@@ -1,0 +1,15 @@
+<!-- templates/mysite/account-accordion-body.html -->
+<div class="list-group my-0">
+  <label class="list-group-item gap-2">
+    <a class="text-decoration-none" href="{% url 'updateAccount' %}">
+      Update account information
+      <small class="d-block text-muted">details go here</small>
+    </a>
+  </label>
+  <label class="list-group-item d-flex gap-2">
+    <a class="text-decoration-none" href="{% url 'deleteAccount' %}">
+      Delete account (make the template for eg "account-delete.html" !)
+      <small class="d-block text-muted">details go here</small>
+    </a>
+  </label>
+</div>

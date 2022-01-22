@@ -1,0 +1,40 @@
+.list-group {
+  width: auto;
+  margin: 4rem auto;
+}
+
+.list-group-checkable {
+  display: grid;
+  gap: .5rem;
+  border: 0;
+}
+.list-group-checkable .list-group-item {
+  cursor: pointer;
+  border-radius: .5rem;
+}
+.list-group-item-check {
+  position: absolute;
+  clip: rect(0, 0, 0, 0);
+  pointer-events: none;
+}
+.list-group-item-check:hover + .list-group-item {
+  background-color: var(--bs-light);
+}
+.list-group-item-check:checked + .list-group-item {
+  color: #fff;
+  background-color: var(--bs-blue);
+}
+.list-group-item-check[disabled] + .list-group-item,
+.list-group-item-check:disabled + .list-group-item {
+  pointer-events: none;
+  filter: none;
+  opacity: .5;
+}
+
+#logout::after {
+  background-image: none;
+}
+
+#logout:not(.collapsed) {
+  background-color: white;
+}

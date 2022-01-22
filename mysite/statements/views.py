@@ -16,8 +16,11 @@ def register(request):
         ctx = {'form': form}
     return render(request, 'registration/register.html', ctx)
 
-def settings(request):
-    return render(request, 'mysite/settings.html')
+def updateAccount(request):
+    return render(request, 'mysite/update.html')
+
+def deleteAccount(request):
+    return render(request, 'mysite/delete.html')
 
 def home(request):
     return render(request, 'mysite/home.html')

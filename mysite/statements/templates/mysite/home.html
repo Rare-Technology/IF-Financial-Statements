@@ -1,5 +1,6 @@
 <!-- templates/mysite/home.html -->
 {% extends 'mysite/base.html' %}
+{% load static %}
 
 {% block content %}
   {% if messages %}
@@ -10,10 +11,45 @@
     {% endfor %}
   {% endif %}
   {% if user.is_authenticated %}
-    Hello, {{ user.username }} !
-    <br>
-    <button type="button"><a href="{% url 'settings' %}">User settings</a></button>
-    <p><a href="{% url 'logout' %}">Log out</a></p>
+  <head>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/list-groups.css' %}">
+  </head>
+  <div class="container">
+    <p class="mx-5 lead">Hello, {{ user.username }} !</p>
+    <div class="accordion" id="accordionExample">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+            Financial statements
+          </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+          {% include 'mysite/fs-accordion-body.html' %}
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingTwo">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            Account settings
+          </button>
+        </h2>
+        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+            {% include 'mysite/account-accordion-body.html' %}
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <a id="logout" class="accordion-button text-decoration-none" type="button" href="{% url 'logout' %}">
+            Log out
+          </a>
+        </h2>
+        <div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <p></p>
   {% else %}
     <p>You are not logged in. <a href="{% url 'login' %}">Click here to log in.</a></p>
     <p>Don't have an account? <a href="{% url 'register' %}">Click here to create an account</a></p>
