@@ -1,23 +1,27 @@
 <!-- templates/mysite/fs-accordion-body.html -->
 <div class="list-group my-0">
   <label class="list-group-item gap-2">
-    <input class="form-check-input flex-shrink-1" type="checkbox" value="" checked>
+    <input class="form-check-input flex-shrink-1 input-statements" type="checkbox" value="">
     <span>
       Income statement
       <small class="d-block text-muted">details go here</small>
     </span>
   </label>
   <label class="list-group-item d-flex gap-2">
-    <input class="form-check-input flex-shrink-0" type="checkbox" value="">
+    <input class="form-check-input flex-shrink-0 input-statements" type="checkbox" value="">
     <span>
       Cashflow statement
       <small class="d-block text-muted">details go here</small>
     </span>
   </label>
-  <label class="list-group-item d-flex gap-2">
-    <input class="flex-shrink-0">
+  <div class="list-group-item d-flex gap-2">
     <span>
-      calendar goes here ...
+      <small class="d-block text-muted">From</small>
+      <input class="input-dates" type="date" name="startDate" disabled>
     </span>
-  </label>
+    <span>
+      <small class="d-block text-muted">To</small>
+      <input class="input-dates" type="date" name="endDate" disabled>
+    </span>
+  </div>
 </div>
