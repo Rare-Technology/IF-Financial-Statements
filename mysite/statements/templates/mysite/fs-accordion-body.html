@@ -7,21 +7,36 @@
       <small class="d-block text-muted">details go here</small>
     </span>
   </label>
-  <label class="list-group-item d-flex gap-2">
+  <label class="list-group-item">
     <input class="form-check-input flex-shrink-0 input-statements" type="checkbox" value="">
     <span>
       Cashflow statement
       <small class="d-block text-muted">details go here</small>
     </span>
   </label>
-  <div class="list-group-item d-flex gap-2">
-    <span>
-      <small class="d-block text-muted">From</small>
-      <input class="input-dates" type="date" name="startDate" disabled>
-    </span>
-    <span>
-      <small class="d-block text-muted">To</small>
-      <input class="input-dates" type="date" name="endDate" disabled>
-    </span>
+  <div class="list-group-item">
+    <div class="container">
+      <div class="row">
+        <span class="col-6 col-md-2" style="margin-right: -3em !important">
+          <small class="d-block text-muted">From</small>
+          <input class="statement-option" type="date" name="startDate" disabled>
+        </span>
+        <span class="col-6 col-md-2">
+          <small class="d-block text-muted">To</small>
+          <input class="statement-option" type="date" name="endDate" disabled>
+        </span>
+        <div class="col-12 col-md-2 my-2 d-grid my-md-auto d-md-block">
+          <button class="btn btn-primary statement-option" type="button" disabled>View Statements</button>
+        </div>
+        <div class="col-12 col-md-6 my-auto">
+          <div id="export-buttons" class="btn-group d-grid gap-2 d-md-block">
+            <button class="btn btn-outline-secondary statement-option" type="button" disabled>Export to PDF</button>
+            <button class="btn btn-outline-secondary statement-option" type="button" disabled>Export to Excel</button>
+            <button class="btn btn-outline-secondary statement-option" type="button" disabled>Email</button>
+            <button class="btn btn-outline-secondary statement-option" type="button" disabled>Print</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
