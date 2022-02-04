@@ -7,20 +7,17 @@ from .models import Catches
 
 # Create your views here.
 def loginAccount(request):
-    print("HELLO")
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
             return redirect('home')
         else:
             messages.success(request, "Error logging in. Please try again.")
-            print("did not log in")
             return redirect('login')
     else:
-        print("not post?")
         return render(request, 'registration/login.html', {})
 
 def register(request):
@@ -28,16 +25,18 @@ def register(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            username = form.cleaned_data.get("username")
-            password = form.cleaned_data.get("password")
-            user = authenticate(request, username=username, password=password)
+            username = form.cleaned_data["username"]
+            password = form.cleaned_data["password1"]
+            user = authenticate(username=username, password=password)
             login(request, user)
-            messages.success(request, "Registration successful. Hello %s!" % username)
+            messages.success(request, "Registration successful!")
             return redirect('home')
+        else:
+            messages.success(request, "Registration failed. Please follow the directions below and try again.")
     else:
         form = UserCreationForm()
-        ctx = {'form': form}
-        return render(request, 'registration/register.html', ctx)
+    ctx = {'form': form}
+    return render(request, 'registration/register.html', ctx)
 
 def updateAccount(request):
     return render(request, 'mysite/update.html')
