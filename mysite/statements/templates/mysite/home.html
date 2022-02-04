@@ -52,8 +52,10 @@
   </div>
   <p></p>
   {% else %}
-    <p>You are not logged in. <a href="{% url 'login' %}">Click here to log in.</a></p>
-    <p>Don't have an account? <a href="{% url 'register' %}">Click here to create an account</a></p>
 
+    <body class="text-center">
+      <p>You are not logged in. <a href="{% url 'login' %}">Click here to log in.</a></p>
+      <p>Don't have an account? <a href="{% url 'register' %}">Click here to create an account</a></p>
+    </body>
   {% endif %}
 {% endblock content %}

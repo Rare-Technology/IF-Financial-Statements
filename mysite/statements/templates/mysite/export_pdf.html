@@ -1,0 +1,36 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <!-- Required metatags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- internal CSS only ! cannot import bootstrap, and copy pasting bootstrap cdn did not work... many tags not supported by xtml2pdf -->
+  </head>
+  <body>
+    OurFish Financial Statement
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Date</th>
+          <th scope="col">Fisher</th>
+          <th scope="col">Total price</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for catch in Catches %}
+          <tr>
+            <!-- <th scope="row">1</th> -->
+            <td>{{ catch.date }}</td>
+            <td>{{ catch.fisher_id }}</td>
+            <td>{{ catch.total_price }}</td>
+          </tr>
+          {% endfor %}
+      </tbody>
+    </table>
+
+  </body>
+</html>

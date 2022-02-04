@@ -1,6 +1,7 @@
 const inputStatements = document.querySelectorAll(".input-statements");
-inputStatements1 = inputStatements[0];
-inputStatements2 = inputStatements[1];
+const inputStatements1 = inputStatements[0];
+const inputStatements2 = inputStatements[1];
+const viewStatements = document.querySelector("#view-statements");
 const statementOptions = document.querySelectorAll(".statement-option");
 const catchesTable = document.querySelector("#catches-div");
 
@@ -14,11 +15,9 @@ inputStatements1.addEventListener("click", function() {
     statementOptions.forEach(element => element.disabled = false);
   };
 
-  if (inputStatements1.checked) {
-    catchesTable.hidden = false;
-  } else {
+  if (!inputStatements1.checked) {
     catchesTable.hidden = true;
-  }
+  };
 });
 
 inputStatements2.addEventListener("click", function() {
@@ -29,5 +28,11 @@ inputStatements2.addEventListener("click", function() {
     statementOptions.forEach(element => element.disabled = true);
   } else {
     statementOptions.forEach(element => element.disabled = false);
+  };
+});
+
+viewStatements.addEventListener("click", function() {
+  if (inputStatements1.checked) {
+    catchesTable.hidden = false;
   };
 });
