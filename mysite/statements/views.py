@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
+from .models import Catches
 
 # Create your views here.
 def register(request):
@@ -23,4 +24,10 @@ def deleteAccount(request):
     return render(request, 'mysite/delete.html')
 
 def home(request):
-    return render(request, 'mysite/home.html')
+    table_data = Catches.objects.all()
+
+    ctx = {
+        'table_data': table_data
+    }
+
+    return render(request, 'mysite/home.html', ctx)

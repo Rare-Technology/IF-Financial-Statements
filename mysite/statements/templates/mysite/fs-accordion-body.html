@@ -1,4 +1,6 @@
 <!-- templates/mysite/fs-accordion-body.html -->
+{% load static %}
+
 <div class="list-group my-0">
   <label class="list-group-item gap-2">
     <input class="form-check-input flex-shrink-1 input-statements" type="checkbox" value="">
@@ -38,5 +40,8 @@
         </div>
       </div>
     </div>
+  </div>
+  <div class="list-group-item">
+    {% include 'mysite/table.html' %}
   </div>
 </div>
