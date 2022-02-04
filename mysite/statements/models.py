@@ -14,7 +14,7 @@ class Catches(models.Model):
 
     fisher_id = models.CharField(max_length = 8) # maybe also foreign key
 
-    date = models.DateTimeField()
+    date = models.DateField()
 
     total_price = models.FloatField()
 

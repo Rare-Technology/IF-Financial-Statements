@@ -21,11 +21,11 @@
       <div class="row">
         <span class="col-6 col-md-2" style="margin-right: -3em !important">
           <small class="d-block text-muted">From</small>
-          <input class="statement-option" type="date" name="startDate" disabled>
+          <input id="start-date" class="statement-option" type="date" name="startDate" disabled>
         </span>
         <span class="col-6 col-md-2">
           <small class="d-block text-muted">To</small>
-          <input class="statement-option" type="date" name="endDate" disabled>
+          <input id="end-date" class="statement-option" type="date" name="endDate" disabled>
         </span>
         <div class="col-12 col-md-2 my-2 d-grid my-md-auto d-md-block">
           <button class="btn btn-primary statement-option" type="button" disabled>View Statements</button>
@@ -41,7 +41,7 @@
       </div>
     </div>
   </div>
-  <div class="list-group-item">
+  <div id="catches-div" class="list-group-item" hidden>
     {% include 'mysite/table.html' %}
   </div>
 </div>

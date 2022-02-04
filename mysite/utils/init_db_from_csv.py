@@ -3,6 +3,7 @@ from statements.models import Catches
 
 def main():
     df = pd.read_csv("./static/ourfish_sample.csv")
+    df['date'] = df['date'].apply(lambda x: x[:10])
 
     samples = [
         Catches(
