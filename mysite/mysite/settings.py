@@ -85,7 +85,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     },
-    'test': {
+    'ourfish': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': cfg.get('ourfish', 'name'),
         'HOST': cfg.get('ourfish', 'host'),

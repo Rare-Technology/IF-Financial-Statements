@@ -38,6 +38,8 @@ class StatementsRouter:
             return db == 'default'
         return None
 
+
+
 class OurfishRouter:
         route_app_labels = {'ourfish'}
 
@@ -46,7 +48,7 @@ class OurfishRouter:
             Attempts to read auth and contenttypes models go to auth_db.
             """
             if model._meta.app_label in self.route_app_labels:
-                return 'test'
+                return 'ourfish'
             return None
 
         def db_for_write(self, model, **hints):
@@ -54,7 +56,7 @@ class OurfishRouter:
             Attempts to write auth and contenttypes models go to auth_db.
             """
             if model._meta.app_label in self.route_app_labels:
-                return 'test'
+                return 'ourfish'
             return None
 
         def allow_relation(self, obj1, obj2, **hints):
@@ -75,5 +77,5 @@ class OurfishRouter:
             'auth_db' database.
             """
             if app_label in self.route_app_labels:
-                return db == 'test'
+                return db == 'ourfish'
             return None
