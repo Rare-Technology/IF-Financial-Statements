@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'statements.apps.StatementsConfig'
+    'statements.apps.StatementsConfig',
+    'ourfish.apps.OurfishConfig',
 ]
 
 MIDDLEWARE = [
@@ -83,8 +84,20 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    },
+    'test': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': cfg.get('ourfish', 'name'),
+        'HOST': cfg.get('ourfish', 'host'),
+        'USER': cfg.get('ourfish', 'user'),
+        'PASSWORD': cfg.get('ourfish', 'password')
+    },
 }
+
+DATABASE_ROUTERS = [
+    'routers.db_routers.StatementsRouter',
+    'routers.db_routers.OurfishRouter',
+]
 
 
 # Password validation
