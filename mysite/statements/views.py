@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.template.loader import get_template
@@ -57,9 +57,26 @@ def updateAccount(request):
             messages.success(request, "Could not change information. Please try again.")
     else:
         form = UpdateAccountForm(instance = request.user)
-        ctx = {'form': form}
+    ctx = {'form': form}
+    return render(request, 'registration/update.html', ctx)
 
-        return render(request, 'registration/update.html', ctx)
+def changePassword(request):
+    if request.method == "POST":
+
+        form = PasswordChangeForm(user = request.user, data = request.POST)
+
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, form.user)
+            return redirect('home')
+        else:
+            messages.success("Could not change password. Double check the instructions and try again.")
+    else:
+        form = PasswordChangeForm(user = request.user)
+    ctx = {'form': form}
+    return render(request, 'registration/password.html', ctx)
+
+
 
 def deleteAccount(request):
     return render(request, 'mysite/delete.html')
