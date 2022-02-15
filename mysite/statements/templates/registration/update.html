@@ -1,6 +1,6 @@
 <!-- templates/mysite/settings.html -->
 {% extends 'mysite/base.html' %}
 {% block content %}
-  This will be the settings page !
+  {{ form.as_p }}
   <p><a href="{% url 'home' %}">Go back</a></p>
 {% endblock content %}

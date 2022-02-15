@@ -1,11 +1,16 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.models import User
 from django.contrib import messages
 from django.template.loader import get_template
+from django.core.mail import EmailMessage
+from mysite.settings import EMAIL_HOST_USER
 from xhtml2pdf import pisa
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 from .models import Catches
+from .forms import UpdateAccountForm
 import csv
 
 # Create your views here.
@@ -42,19 +47,61 @@ def register(request):
     return render(request, 'registration/register.html', ctx)
 
 def updateAccount(request):
-    return render(request, 'mysite/update.html')
+    if request.method == "POST":
+        form = UpdateAccountForm(request.POST, instance = request.user)
+
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+        else:
+            messages.success(request, "Could not change information. Please try again.")
+    else:
+        form = UpdateAccountForm(instance = request.user)
+        ctx = {'form': form}
+
+        return render(request, 'registration/update.html', ctx)
 
 def deleteAccount(request):
     return render(request, 'mysite/delete.html')
 
 def home(request):
-    table_data = Catches.objects.all()
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            # create and send Email
 
-    ctx = {
-        'table_data': table_data
-    }
+            context = {'Catches': Catches.objects.all()[:10]}
+            template = get_template('mysite/export_pdf.html')
+            html = template.render(context)
 
-    return render(request, 'mysite/home.html', ctx)
+            tmpdir = TemporaryDirectory()
+            pdf_file = NamedTemporaryFile(dir = tmpdir)
+
+            pisa_status = pisa.CreatePDF(html, dest = pdf_file)
+
+            if pisa_status.err:
+                return HttpResponse("Something went wrong. Please try again.")
+
+            email = EmailMessage(
+                "Ourfish Financial Statement",
+                "Here is your financial statement for the period from ... to ...",
+                EMAIL_HOST_USER,
+                request.user.email,
+                attachments = [(pdf_file.name, pdf_file, 'application/zip')]
+            )
+            email.send(fail_silently = False)
+
+            pdf_file.close()
+            tmpdir.close()
+
+        table_data = Catches.objects.all()
+
+        ctx = {
+            'table_data': table_data
+        }
+
+        return render(request, 'mysite/home.html', ctx)
+    else:
+        return render(request, 'mysite/home.html')
 
 def export_pdf(request):
     template_path = 'mysite/export_pdf.html'

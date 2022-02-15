@@ -156,3 +156,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # URL for redirect after login/logout
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+# Email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = cfg.get('email', 'host')
+EMAIL_PORT = cfg.get('email', 'port')
+EMAIL_HOST_USER = cfg.get('email', 'user')
+EMAIL_HOST_PASSWORD = cfg.get('email', 'password')
+# EMAIL_USE_TLS = True
