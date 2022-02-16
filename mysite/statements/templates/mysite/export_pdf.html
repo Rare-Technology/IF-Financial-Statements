@@ -24,9 +24,9 @@
         {% for row in data %}
           <tr>
             <!-- <th scope="row">1</th> -->
-            <td>{{ catch.date }}</td>
-            <td>{{ catch.fisher_id }}</td>
-            <td>{{ catch.total_price }}</td>
+            <td>{{ row.date }}</td>
+            <td>{{ row.fisher_id }}</td>
+            <td>{{ row.total_price }}</td>
           </tr>
           {% endfor %}
       </tbody>

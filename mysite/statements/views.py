@@ -8,7 +8,7 @@ from django.template.loader import get_template
 from django.core.mail import EmailMessage
 from mysite.settings import EMAIL_HOST_USER
 from xhtml2pdf import pisa
-from tempfile import NamedTemporaryFile, TemporaryDirectory
+from tempfile import TemporaryFile
 from .models import Catches
 from .forms import UpdateAccountForm
 import csv
@@ -23,7 +23,7 @@ def loginAccount(request):
             login(request, user)
             return redirect('home')
         else:
-            messages.success(request, "Error logging in. Please try again.")
+            messages.error(request, "Error logging in. Please try again.")
             return redirect('login')
     else:
         return render(request, 'registration/login.html', {})
@@ -40,7 +40,7 @@ def register(request):
             messages.success(request, "Registration successful!")
             return redirect('home')
         else:
-            messages.success(request, "Registration failed. Please follow the directions below and try again.")
+            messages.error(request, "Registration failed. Please follow the directions below and try again.")
     else:
         form = UserCreationForm()
     ctx = {'form': form}
@@ -52,9 +52,10 @@ def updateAccount(request):
 
         if form.is_valid():
             form.save()
+            messages.success(request, "Your email address has been updated.")
             return redirect('home')
         else:
-            messages.success(request, "Could not change information. Please try again.")
+            messages.error(request, "Could not change information. Please try again.")
     else:
         form = UpdateAccountForm(instance = request.user)
     ctx = {'form': form}
@@ -70,7 +71,7 @@ def changePassword(request):
             update_session_auth_hash(request, form.user)
             return redirect('home')
         else:
-            messages.success("Could not change password. Double check the instructions and try again.")
+            messages.error(request, "Could not change password. Double check the instructions and try again.")
     else:
         form = PasswordChangeForm(user = request.user)
     ctx = {'form': form}
@@ -150,7 +151,7 @@ def send_email(request):
             template = get_template('mysite/export_pdf.html')
             html = template.render(context)
 
-            pdf_file = NamedTemporaryFile()
+            pdf_file = TemporaryFile()
 
             pisa_status = pisa.CreatePDF(html, dest = pdf_file)
 
@@ -163,7 +164,7 @@ def send_email(request):
             pdf_file.close()
 
         if 'attach_excel' in request.POST.keys():
-            excel_file = NamedTemporaryFile()
+            excel_file = TemporaryFile(mode = 'w+')
 
             writer = csv.writer(excel_file)
 
@@ -173,10 +174,12 @@ def send_email(request):
             for row in data:
                 writer.writerow([row.date, row.fisher_id, row.total_price])
 
-            email.attach('statement.csv', excel_file, 'text/csv')
+            excel_file.seek(0)
+            email.attach('statement.csv', excel_file.read(), 'text/csv')
 
-            pdf_file.close()
+            excel_file.close()
 
         email.send(fail_silently = False)
 
-        return HttpResponse("Email sent!")
+        messages.success(request, "Your email has been sent. Check your inbox shortly.")
+        return redirect("home")
