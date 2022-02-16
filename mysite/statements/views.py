@@ -83,33 +83,6 @@ def deleteAccount(request):
 
 def home(request):
     if request.user.is_authenticated:
-        if request.method == "POST":
-            # create and send Email
-
-            context = {'Catches': Catches.objects.all()[:10]}
-            template = get_template('mysite/export_pdf.html')
-            html = template.render(context)
-
-            tmpdir = TemporaryDirectory()
-            pdf_file = NamedTemporaryFile(dir = tmpdir)
-
-            pisa_status = pisa.CreatePDF(html, dest = pdf_file)
-
-            if pisa_status.err:
-                return HttpResponse("Something went wrong. Please try again.")
-
-            email = EmailMessage(
-                "Ourfish Financial Statement",
-                "Here is your financial statement for the period from ... to ...",
-                EMAIL_HOST_USER,
-                request.user.email,
-                attachments = [(pdf_file.name, pdf_file, 'application/zip')]
-            )
-            email.send(fail_silently = False)
-
-            pdf_file.close()
-            tmpdir.close()
-
         table_data = Catches.objects.all()
 
         ctx = {
@@ -117,18 +90,16 @@ def home(request):
         }
 
         return render(request, 'mysite/home.html', ctx)
-    else:
-        return render(request, 'mysite/home.html')
 
 def export_pdf(request):
     template_path = 'mysite/export_pdf.html'
-    context = {'Catches': Catches.objects.all()[:10]}
+    context = {'data': Catches.objects.all()[:10]}
 
     # Create a Django response object, and specify content_type as pdf
-    response = HttpResponse(content_type='application/pdf')
-
-    # to directly download the pdf we need attachment
-    response['Content-Disposition'] = 'attachment; filename="statement.pdf"'
+    response = HttpResponse(
+        content_type = 'application/pdf',
+        headers = {'Content-Disposition': 'attachment; filename="statement.pdf"'},
+    )
 
     # find the template and render it.
     template = get_template(template_path)
@@ -157,3 +128,55 @@ def export_csv(request):
         writer.writerow([catch.date, catch.fisher_id, catch.total_price])
 
     return response
+
+def send_email(request):
+    if request.method == "POST":
+        # create and send Email
+
+        email = EmailMessage(
+            "Ourfish Financial Statement",
+            "Here is your financial statement for the period from ... to ...",
+            EMAIL_HOST_USER,
+            [request.user.email]
+        )
+
+        # The conditionals on the next if statements look a bit weird but I prefered
+        # to write it this way rather than checking the value of eg request.POST['attach_pdf'].
+        # Without using a sneaky/hack-y trick, unchecked boxes from the form will not pass in POST
+        # and thus will raise a key value error if using request.POST['<key>'] in a conditional
+        # see this for the sneaky trick in reference https://stackoverflow.com/questions/1809494/post-unchecked-html-checkboxes
+        if 'attach_pdf' in request.POST.keys():
+            context = {'data': Catches.objects.all()[:10]}
+            template = get_template('mysite/export_pdf.html')
+            html = template.render(context)
+
+            pdf_file = NamedTemporaryFile()
+
+            pisa_status = pisa.CreatePDF(html, dest = pdf_file)
+
+            if pisa_status.err:
+                return HttpResponse("Something went wrong. Please try again.")
+
+            pdf_file.seek(0)
+            email.attach('statement.pdf', pdf_file.read(), 'application/pdf')
+
+            pdf_file.close()
+
+        if 'attach_excel' in request.POST.keys():
+            excel_file = NamedTemporaryFile()
+
+            writer = csv.writer(excel_file)
+
+            writer.writerow(['Date', 'Fisher', 'Total price']) # Don't forget to change this when changing data !
+
+            data = Catches.objects.all()[:10]
+            for row in data:
+                writer.writerow([row.date, row.fisher_id, row.total_price])
+
+            email.attach('statement.csv', excel_file, 'text/csv')
+
+            pdf_file.close()
+
+        email.send(fail_silently = False)
+
+        return HttpResponse("Email sent!")

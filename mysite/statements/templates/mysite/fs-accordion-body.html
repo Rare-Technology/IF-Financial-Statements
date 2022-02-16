@@ -1,6 +1,8 @@
 <!-- templates/mysite/fs-accordion-body.html -->
 {% load static %}
-
+<head>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/financial-statements-tab.css' %}">
+</head>
 <div class="list-group my-0">
   <label class="list-group-item gap-2">
     <input class="form-check-input flex-shrink-1 input-statements" type="checkbox" value="">
@@ -32,9 +34,24 @@
         </div>
         <div class="col-12 col-md-6 my-auto">
           <div id="export-buttons" class="btn-group d-grid gap-2 d-md-block">
-            <button class="btn btn-outline-secondary statement-option" type="button" disabled><a style="text-decoration: none" href="{% url 'export_pdf' %}" target="_blank" role="button">Export to PDF</a></button>
-            <button class="btn btn-outline-secondary statement-option" type="button" disabled><a style="text-decoration: none" href="{% url 'export_csv' %}" target="_blank" role="button">Export to Excel</a></button>
-            <button class="btn btn-outline-secondary statement-option" type="button" disabled>Email</button>
+            <button class="btn btn-outline-secondary statement-option" type="button" disabled><a class="export-link" href="{% url 'export_pdf' %}" target="_blank" role="button">Export to PDF</a></button>
+            <button class="btn btn-outline-secondary statement-option" type="button" disabled><a class="export-link" href="{% url 'export_csv' %}" target="_blank" role="button">Export to Excel</a></button>
+            <button class="btn btn-outline-secondary dropdown-toggle statement-option" type="button" id="print-button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" disabled>Email</button>
+              <ul class="dropdown-menu" aria-labelledby="print-button">
+                <form action="/send_email/" method="POST">
+                  {% csrf_token %}
+                  <li>
+                    <input class="form-check-input ms-3" type="checkbox" id="email-check-1" name="attach_pdf">
+                    <label class="form-check-label" for="email-check-1">PDF</label>
+                  </li>
+                  <li>
+                    <input class="form-check-input ms-3" type="checkbox" id="email-check-2" name="attach_excel">
+                    <label class="form-check-label" for="email-check-2">Excel</label>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><button class="btn btn-link" type="submit">Send email</button></li>
+                </form>
+              </ul>
             <button class="btn btn-outline-secondary statement-option" type="button" disabled>Print</button>
           </div>
         </div>

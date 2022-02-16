@@ -163,4 +163,4 @@ EMAIL_HOST = cfg.get('email', 'host')
 EMAIL_PORT = cfg.get('email', 'port')
 EMAIL_HOST_USER = cfg.get('email', 'user')
 EMAIL_HOST_PASSWORD = cfg.get('email', 'password')
-# EMAIL_USE_TLS = True
+EMAIL_USE_TLS = True
