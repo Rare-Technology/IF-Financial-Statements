@@ -1,17 +1,24 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth.hashers import check_password
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth.models import User
+from ourfish.models import AuthUser
 from django.contrib import messages
 from django.template.loader import get_template
 from django.core.mail import EmailMessage
 from mysite.settings import EMAIL_HOST_USER
 from xhtml2pdf import pisa
 from tempfile import TemporaryFile
-from .models import Catches
 from .forms import UpdateAccountForm
 import csv
+
+Catches = {
+    'catch': [1,2,3],
+    'date': ['2022-02-17', '2022-02-17', '2022-02-16'],
+    'fisher_id': ['sadf32rf', '2gd782', 'gf9w8']
+}
 
 # Create your views here.
 def loginAccount(request):
@@ -52,7 +59,7 @@ def updateAccount(request):
 
         if form.is_valid():
             form.save()
-            messages.success(request, "Your email address has been updated.")
+            messages.info(request, "Your email address has been updated.")
             return redirect('home')
         else:
             messages.error(request, "Could not change information. Please try again.")
@@ -71,7 +78,7 @@ def changePassword(request):
             update_session_auth_hash(request, form.user)
             return redirect('home')
         else:
-            messages.error(request, "Could not change password. Double check the instructions and try again.")
+            messages.success(request, "Could not change password. Double check the instructions and try again.")
     else:
         form = PasswordChangeForm(user = request.user)
     ctx = {'form': form}
@@ -84,13 +91,15 @@ def deleteAccount(request):
 
 def home(request):
     if request.user.is_authenticated:
-        table_data = Catches.objects.all()
+        table_data = Catches
 
         ctx = {
             'table_data': table_data
         }
 
         return render(request, 'mysite/home.html', ctx)
+    else:
+        return redirect('login')
 
 def export_pdf(request):
     template_path = 'mysite/export_pdf.html'

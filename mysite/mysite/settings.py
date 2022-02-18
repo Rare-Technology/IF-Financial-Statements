@@ -118,6 +118,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'mysite.auth.backends.OurfishAuthBackend'
+]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
@@ -164,3 +168,5 @@ EMAIL_PORT = cfg.get('email', 'port')
 EMAIL_HOST_USER = cfg.get('email', 'user')
 EMAIL_HOST_PASSWORD = cfg.get('email', 'password')
 EMAIL_USE_TLS = True
+
+# AUTH_USER_MODEL = 'ourfish.AuthUser'
