@@ -91,13 +91,23 @@ def deleteAccount(request):
 
 def home(request):
     if request.user.is_authenticated:
-        table_data = Catches
+        if request.method == "POST":
+            user = request.user
+            start_date = request.POST['start_date']
+            end_date = request.POST['end_date']
+            print(start_date)
+            print(end_date)
+            # income_statement = generate_income_statement(user, start_date, end_date)
+            # cashflow_statement = generate_cashflow_statement(user, start_date, end_date, income_statement)
 
-        ctx = {
-            'table_data': table_data
-        }
+            ctx = {
+                'table_data': Catches
+                # 'income_statement': income_statement,
+                # 'cashflow_statement': cashflow_statement
+            }
 
-        return render(request, 'mysite/home.html', ctx)
+            return render(request, 'mysite/home.html', ctx)
+        return render(request, 'mysite/home.html')
     else:
         return redirect('login')
 
