@@ -12,25 +12,7 @@
   <body>
     OurFish Financial Statement
 
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">Date</th>
-          <th scope="col">Fisher</th>
-          <th scope="col">Total price</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in data %}
-          <tr>
-            <!-- <th scope="row">1</th> -->
-            <td>{{ row.date }}</td>
-            <td>{{ row.fisher_id }}</td>
-            <td>{{ row.total_price }}</td>
-          </tr>
-          {% endfor %}
-      </tbody>
-    </table>
+    {{ income_statement}}
 
   </body>
 </html>

@@ -13,12 +13,13 @@ from xhtml2pdf import pisa
 from tempfile import TemporaryFile
 from .forms import UpdateAccountForm
 import csv
+import pandas as pd
+from datetime import date
+from statements.utils import generate_income_statement, generate_cashflow_statement
 
-Catches = {
-    'catch': [1,2,3],
-    'date': ['2022-02-17', '2022-02-17', '2022-02-16'],
-    'fisher_id': ['sadf32rf', '2gd782', 'gf9w8']
-}
+
+
+
 
 # Create your views here.
 def loginAccount(request):
@@ -84,36 +85,43 @@ def changePassword(request):
     ctx = {'form': form}
     return render(request, 'registration/password.html', ctx)
 
-
-
 def deleteAccount(request):
     return render(request, 'mysite/delete.html')
 
 def home(request):
     if request.user.is_authenticated:
-        if request.method == "POST":
-            user = request.user
-            start_date = request.POST['start_date']
-            end_date = request.POST['end_date']
-            print(start_date)
-            print(end_date)
-            # income_statement = generate_income_statement(user, start_date, end_date)
-            # cashflow_statement = generate_cashflow_statement(user, start_date, end_date, income_statement)
-
-            ctx = {
-                'table_data': Catches
-                # 'income_statement': income_statement,
-                # 'cashflow_statement': cashflow_statement
-            }
-
-            return render(request, 'mysite/home.html', ctx)
+        ctx = {'income_table': None}
         return render(request, 'mysite/home.html')
     else:
         return redirect('login')
 
+def view_statement(request):
+    if request.method == "POST":
+        user = request.user
+        start_date = date.fromisoformat("2022-01-01")#request.POST.get('start-date'))
+        end_date = date.fromisoformat("2022-02-22") #request.POST.get('end-date'))
+        income = generate_income_statement(user, start_date, end_date)
+        # cashflow_statement = generate_cashflow_statement(user, start_date, end_date, income_statement)
+
+        income_table = income.to_html(classes = "table table-striped table-responsive", justify='left')
+        ctx = {
+            'income_table': income_table
+        }
+
+        return HttpResponse(income_table)
+
 def export_pdf(request):
     template_path = 'mysite/export_pdf.html'
-    context = {'data': Catches.objects.all()[:10]}
+
+    user = request.user
+    start_date = date.fromisoformat("2022-01-01")#request.POST.get('start-date'))
+    end_date = date.fromisoformat("2022-02-22") #request.POST.get('end-date'))
+    income = generate_income_statement(user, start_date, end_date)
+    # cashflow_statement = generate_cashflow_statement(user, start_date, end_date, income_statement)
+
+    income_table = income.to_html(classes = "table table-striped table-responsive", justify='center')
+
+    context = {'income_statement': income_table}
 
     # Create a Django response object, and specify content_type as pdf
     response = HttpResponse(
@@ -144,6 +152,9 @@ def export_csv(request):
     writer = csv.writer(response)
 
     writer.writerow(['Date', 'Fisher', 'Total price'])
+
+
+
     for catch in Catches.objects.all()[:10]:
         writer.writerow([catch.date, catch.fisher_id, catch.total_price])
 
@@ -202,3 +213,17 @@ def send_email(request):
 
         messages.success(request, "Your email has been sent. Check your inbox shortly.")
         return redirect("home")
+
+def print_statement(request):
+    user = request.user
+    start_date = date.fromisoformat("2022-01-01")#request.POST.get('start-date'))
+    end_date = date.fromisoformat("2022-02-22") #request.POST.get('end-date'))
+    income = generate_income_statement(user, start_date, end_date)
+    # cashflow_statement = generate_cashflow_statement(user, start_date, end_date, income_statement)
+
+    income_table = income.to_html(classes = "table table-striped table-responsive", justify='center')
+    ctx = {
+        'income_statement': income_table
+    }
+
+    return render(request, 'mysite/print_statement.html', ctx)
