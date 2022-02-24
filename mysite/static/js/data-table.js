@@ -30,7 +30,12 @@ $(document).ready(function() {
     });
 
     // DataTables initialisation
-    let table = $('#catches').DataTable();
+    let table = $('#income-table').DataTable({
+         dom: 'Bfrtip',
+         buttons: [
+             'excel', 'pdf', 'print'
+         ]
+    });
 
     // Refilter the table
     $('#start-date, #end-date').on('change', function () {

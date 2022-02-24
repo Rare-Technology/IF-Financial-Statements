@@ -21,22 +21,19 @@
   <div class="list-group-item">
     <div class="container">
       <div class="row">
-        <form id="date-range" action="{% url 'view_statement' %}" method="POST">
-          {% csrf_token %}
           <div class="row">
             <div class="col-6 col-md-2">
               <small class="d-block text-muted">From</small>
-              <input id="start-date" class="form-control statement-option" type="date" name="start-date" disabled style="display:inline">
+              <input id="start-date" class="statement-option" type="date" name="start-date" disabled style="display:inline">
             </div>
             <div class="col-6 col-md-2">
               <small class="d-block text-muted">To</small>
-              <input id="end-date" class="form-control statement-option" type="date" name="end-date" disabled style="display:inline">
+              <input id="end-date" class="statement-option" type="date" name="end-date" disabled style="display:inline">
             </div>
             <div class="col-12 col-md-2 my-2 d-grid my-md-3">
-              <button id="view-statements" class="form-control btn btn-primary statement-option" target="_blank" type="submit" disabled>View Statements</button>
+              <button id="view-statements" class="btn btn-primary statement-option" target="_blank" type="button" disabled>View Statements</button>
             </div>
           </div>
-        </form>
         <div class="col-12 col-md-6 my-auto">
           <div id="export-buttons" class="btn-group d-grid gap-2 d-md-block">
             <button class="btn btn-outline-secondary statement-option" type="button" disabled><a class="export-link" href="{% url 'export_pdf' %}" target="_blank" role="button">Export to PDF</a></button>

@@ -90,8 +90,31 @@ def deleteAccount(request):
 
 def home(request):
     if request.user.is_authenticated:
-        ctx = {'income_table': None}
-        return render(request, 'mysite/home.html')
+        user = request.user
+        start_date = date.fromisoformat("2022-01-01")#request.POST.get('start-date'))
+        end_date = date.fromisoformat("2022-02-22") #request.POST.get('end-date'))
+        income = generate_income_statement(user, start_date, end_date)
+        # cashflow_statement = generate_cashflow_statement(user, start_date, end_date, income_statement)
+
+        income_table = [
+            {
+                'revenue': row['revenue'],
+                'cost': row['cost'],
+                'profit': row['profit']
+            } for _, row in income.iterrows()
+        ]
+
+        income_table[0]['date'] = date.fromisoformat('2022-02-01')
+        income_table[1]['date'] = date.fromisoformat('2022-01-01')
+
+        #income.to_html(classes = "table table-striped table-responsive", justify='left')
+        ctx = {
+            'income_table': income_table,
+            'start_date': start_date,
+            'end_date': end_date
+        }
+
+        return render(request, 'mysite/home.html', ctx)
     else:
         return redirect('login')
 
@@ -105,7 +128,9 @@ def view_statement(request):
 
         income_table = income.to_html(classes = "table table-striped table-responsive", justify='left')
         ctx = {
-            'income_table': income_table
+            'income_table': income_table,
+            'start_date': start_date,
+            'end_date': end_date
         }
 
         return HttpResponse(income_table)
