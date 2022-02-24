@@ -104,8 +104,8 @@ def home(request):
             } for _, row in income.iterrows()
         ]
 
-        income_table[0]['date'] = date.fromisoformat('2022-02-01')
-        income_table[1]['date'] = date.fromisoformat('2022-01-01')
+        income_table[0]['date'] = '2022-02-06'
+        income_table[1]['date'] = '2022-01-05'
 
         #income.to_html(classes = "table table-striped table-responsive", justify='left')
         ctx = {
