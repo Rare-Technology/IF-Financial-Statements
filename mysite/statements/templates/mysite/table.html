@@ -2,18 +2,30 @@
   <thead>
     <tr>
       <th>Date</th>
-      <th>Revenue</th>
-      <th>Cost</th>
-      <th>Profit</th>
+      <th>Fish revenue</th>
+      <th>Fish expenses</th>
+      <th>Fish profit</th>
+      <th>Supply revenue</th>
+      <th>Supply expenses</th>
+      <th>Supply profit</th>
+      <th>Total revenue</th>
+      <th>Total expenses</th>
+      <th>Total profit</th>
     </tr>
   </thead>
   <tbody>
     {% for row in income_table %}
       <tr>
         <td>{{ row.date }}</td>
-        <td>{{ row.revenue }}</td>
-        <td>{{ row.cost }}</td>
-        <td>{{ row.profit }}</td>
+        <td>{{ row.fish_revenue }}</td>
+        <td>{{ row.fish_expenses }}</td>
+        <td>{{ row.fish_profit }}</td>
+        <td>{{ row.supply_revenue }}</td>
+        <td>{{ row.supply_expenses }}</td>
+        <td>{{ row.supply_profit }}</td>
+        <td>{{ row.total_revenue }}</td>
+        <td>{{ row.total_expenses }}</td>
+        <td>{{ row.total_profit }}</td>
       </tr>
     {% endfor %}
   </tbody>

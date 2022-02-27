@@ -36,10 +36,10 @@
           </div>
         <div class="col-12 col-md-6 my-auto">
           <div id="export-buttons" class="btn-group d-grid gap-2 d-md-block">
-            <button class="btn btn-outline-secondary statement-option" type="button" disabled><a class="export-link" href="{% url 'export_pdf' %}" target="_blank" role="button">Export to PDF</a></button>
-            <button class="btn btn-outline-secondary statement-option" type="button" disabled><a class="export-link" href="{% url 'export_csv' %}" target="_blank" role="button">Export to Excel</a></button>
-            <button class="btn btn-outline-secondary dropdown-toggle statement-option" type="button" id="print-button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" disabled>Email</button>
-              <ul class="dropdown-menu" aria-labelledby="print-button">
+            <!-- <button class="btn btn-outline-secondary statement-option" type="button" disabled><a class="export-link" href="{% url 'export_pdf' %}" target="_blank" role="button">Export to PDF</a></button>
+            <button class="btn btn-outline-secondary statement-option" type="button" disabled><a class="export-link" href="{% url 'export_csv' %}" target="_blank" role="button">Export to Excel</a></button> -->
+            <button class="btn btn-outline-secondary dropdown-toggle statement-option" type="button" id="email-button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" disabled>Email</button>
+              <ul class="dropdown-menu" aria-labelledby="email-button">
                 <form action="/send_email/" method="POST">
                   {% csrf_token %}
                   <li>
@@ -54,7 +54,7 @@
                   <li><button class="btn btn-link" type="submit">Send email</button></li>
                 </form>
               </ul>
-              <button class="btn btn-outline-secondary statement-option" type="button" disabled><a class="export-link" href="{% url 'print_statement' %}" target="_blank" role="button">Print</a></button>
+              <!-- <button class="btn btn-outline-secondary statement-option" type="button" disabled><a class="export-link" href="{% url 'print_statement' %}" target="_blank" role="button">Print</a></button> -->
           </div>
         </div>
       </div>

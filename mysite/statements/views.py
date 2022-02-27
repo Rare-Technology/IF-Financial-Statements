@@ -91,27 +91,30 @@ def deleteAccount(request):
 def home(request):
     if request.user.is_authenticated:
         user = request.user
-        start_date = date.fromisoformat("2022-01-01")#request.POST.get('start-date'))
-        end_date = date.fromisoformat("2022-02-22") #request.POST.get('end-date'))
-        income = generate_income_statement(user, start_date, end_date)
+        income = generate_income_statement(user)
         # cashflow_statement = generate_cashflow_statement(user, start_date, end_date, income_statement)
 
         income_table = [
             {
-                'revenue': row['revenue'],
-                'cost': row['cost'],
-                'profit': row['profit']
+                'date': row.name,
+                'fish_revenue': row['revenue_fish'],
+                'fish_expenses': row['expenses_fish'],
+                'fish_profit': row['profit_fish'],
+                'supply_revenue': row['revenue_supplies'],
+                'supply_expenses': row['expenses_supplies'],
+                'supply_profit': row['profit_supplies'],
+                'total_revenue': row['revenue_total'],
+                'total_expenses': row['expenses_total'],
+                'total_profit': row['profit_total']
             } for _, row in income.iterrows()
         ]
 
-        income_table[0]['date'] = '2022-02-06'
-        income_table[1]['date'] = '2022-01-05'
+        # income_table[0]['date'] = '2022-02-06'
+        # income_table[1]['date'] = '2022-01-05'
 
         #income.to_html(classes = "table table-striped table-responsive", justify='left')
         ctx = {
-            'income_table': income_table,
-            'start_date': start_date,
-            'end_date': end_date
+            'income_table': income_table
         }
 
         return render(request, 'mysite/home.html', ctx)
