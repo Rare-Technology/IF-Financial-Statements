@@ -28,15 +28,19 @@ $(document).ready(function() {
              'excel', 'pdf', 'print'
          ],
          order: [[1, 'asc']],
+         ordering: false,
+         bPaginate: false,
+         bInfo: false,
          rowGroup: {
            dataSrc: 1
          },
+         searching: false,
          responsive: true
     });
 
     $('#income-table').wrap("<div class='scrollTable'></div>");
 
-    // Initial column filter
+    // Initial column filter and removing sorting
     table.columns().every( function() {
       if (this.header().textContent != "Date") {
         let min = new Date($('#start-date').val());
