@@ -29,15 +29,15 @@ def fish_profit(buyer):
     date = [obj.delivery_date for obj in fish_inventory]
 
     transactions = {
-        'revenue': revenue,
-        'expenses': expenses,
+        'Revenue': revenue,
+        'Expenses': expenses,
         'date': date
     }
     transactions = pd.DataFrame(data = transactions)
-    transactions['date'] = transactions['date'].apply(lambda x: x.date().replace(day = 1).isoformat())
+    transactions['date'] = transactions['date'].apply(lambda x: x.date().replace(day = 1))
 
     fish_income = transactions.groupby(by = 'date').sum()
-    fish_income['profit'] = fish_income['revenue'] - fish_income['expenses']
+    fish_income['Profit'] = fish_income['Revenue'] - fish_income['Expenses']
 
     return fish_income
 
@@ -79,24 +79,24 @@ def supplies_profit(buyer):
 
     revenue_transactions = {
         'date': revenue_date,
-        'revenue': revenue
+        'Revenue': revenue
     }
     expenses_transactions = {
         'date': expenses_date,
-        'expenses': expenses
+        'Expenses': expenses
     }
     revenue_transactions = pd.DataFrame(data = revenue_transactions)
     expenses_transactions = pd.DataFrame(data = expenses_transactions)
 
-    revenue_transactions['date'] = revenue_transactions['date'].apply(lambda x: x.date().replace(day = 1).isoformat())
-    expenses_transactions['date'] = expenses_transactions['date'].apply(lambda x: x.date().replace(day = 1).isoformat())
+    revenue_transactions['date'] = revenue_transactions['date'].apply(lambda x: x.date().replace(day = 1))
+    expenses_transactions['date'] = expenses_transactions['date'].apply(lambda x: x.date().replace(day = 1))
 
     supply_revenue = revenue_transactions.groupby(by = 'date').sum()
     supply_expenses = expenses_transactions.groupby(by = 'date').sum()
-    supply_expenses['expenses'] = -supply_expenses['expenses']
+    supply_expenses['Expenses'] = -supply_expenses['Expenses']
 
     supplies_income = supply_revenue.join(supply_expenses, how='outer').fillna(0)
-    supplies_income['profit'] = supplies_income['revenue'] - supplies_income['expenses']
+    supplies_income['Profit'] = supplies_income['Revenue'] - supplies_income['Expenses']
     return supplies_income
 
 def generate_income_statement(user):
@@ -107,13 +107,13 @@ def generate_income_statement(user):
     fish_income = fish_profit(buyer)
     supplies_income = supplies_profit(buyer)
 
-    print(fish_income)
-    print(supplies_income)
 
-    income = fish_income.join(supplies_income, how='outer', lsuffix='_fish', rsuffix='_supplies').fillna(0)
-    income['revenue_total'] = income['revenue_fish'] + income['revenue_supplies']
-    income['expenses_total'] = income['expenses_fish'] + income['expenses_supplies']
-    income['profit_total'] = income['profit_fish'] + income['profit_supplies']
+    income = fish_income.join(supplies_income, how='outer', lsuffix='_Fish', rsuffix='_Supplies').fillna(0)
+    income['Revenue_Total'] = income['Revenue_Fish'] + income['Revenue_Supplies']
+    income['Expenses_Total'] = income['Expenses_Fish'] + income['Expenses_Supplies']
+    income['Profit_Total'] = income['Profit_Fish'] + income['Profit_Supplies']
+
+    income.index = income.index.map(lambda x: x.strftime('%b %Y'))
 
     return income
 

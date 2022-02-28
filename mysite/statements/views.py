@@ -96,25 +96,13 @@ def home(request):
 
         income_table = [
             {
-                'metric': name,
+                'metric': name.split('_')[0],
+                'source': name.split('_')[1],
                 'data': col.values
-                # 'fish_revenue': row['revenue_fish'],
-                # 'fish_expenses': row['expenses_fish'],
-                # 'fish_profit': row['profit_fish'],
-                # 'supply_revenue': row['revenue_supplies'],
-                # 'supply_expenses': row['expenses_supplies'],
-                # 'supply_profit': row['profit_supplies'],
-                # 'total_revenue': row['revenue_total'],
-                # 'total_expenses': row['expenses_total'],
-                # 'total_profit': row['profit_total']
             } for name, col in income.items()
         ]
         income_dates = income.index.values
 
-        # income_table[0]['date'] = '2022-02-06'
-        # income_table[1]['date'] = '2022-01-05'
-
-        #income.to_html(classes = "table table-striped table-responsive", justify='left')
         ctx = {
             'income_table': income_table,
             'income_dates': income_dates
