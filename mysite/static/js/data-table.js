@@ -21,8 +21,8 @@ function bY_to_iso (date) {
 }
 
 $(document).ready(function() {
-    // DataTables initialisation
-    let table = $('#income-table').DataTable({
+    // DataTables initialisation for income
+    let income_table = $('#income-table').DataTable({
          dom: 'Bfrtip',
          buttons: [
              'excel', 'pdf', 'print'
@@ -38,10 +38,25 @@ $(document).ready(function() {
          responsive: true
     });
 
+    // add horizontal scrolling
     $('#income-table').wrap("<div class='scrollTable'></div>");
 
+    // and now cashflow
+    let cashflow_table = $('#cashflow-table').DataTable({
+         dom: 'Bfrtip',
+         buttons: [
+             'excel', 'pdf', 'print'
+         ],
+         ordering: false,
+         bPaginate: false,
+         bInfo: false,
+         searching: false,
+         responsive: true
+    });
+    $('#cashflow-table').wrap("<div class='scrollTable'></div>");
+
     // Initial column filter and removing sorting
-    table.columns().every( function() {
+    income_table.columns().every( function() {
       if (this.header().textContent != "Date") {
         let min = new Date($('#start-date').val());
         let max = new Date($('#end-date').val());
@@ -61,9 +76,50 @@ $(document).ready(function() {
       }
     });
 
-    // Refilter the table
+    // and cashflow
+    cashflow_table.columns().every( function() {
+      if (this.header().textContent != "Date") {
+        let min = new Date($('#start-date').val());
+        let max = new Date($('#end-date').val());
+        let isodate = bY_to_iso(this.header().textContent);
+        let date = new Date(isodate);
+
+        if (
+            ( min === null && max === null ) ||
+            ( min === null && date <= max ) ||
+            ( min <= date   && max === null ) ||
+            ( min <= date   && date <= max )
+        ) {
+            this.visible(true);
+        } else {
+            this.visible(false);
+        }
+      }
+    });
+
+    // Refilter the tables
     $('#start-date, #end-date').on('change', function () {
-        table.columns().every( function() {
+        income_table.columns().every( function() {
+          if (this.header().textContent != "Date") {
+            let min = new Date($('#start-date').val());
+            let max = new Date($('#end-date').val());
+            let isodate = bY_to_iso(this.header().textContent);
+            let date = new Date(isodate);
+
+            if (
+                ( min === null && max === null ) ||
+                ( min === null && date <= max ) ||
+                ( min <= date   && max === null ) ||
+                ( min <= date   && date <= max )
+            ) {
+                this.visible(true);
+            } else {
+                this.visible(false);
+            }
+          }
+        });
+
+        cashflow_table.columns().every( function() {
           if (this.header().textContent != "Date") {
             let min = new Date($('#start-date').val());
             let max = new Date($('#end-date').val());

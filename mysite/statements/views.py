@@ -92,7 +92,8 @@ def home(request):
     if request.user.is_authenticated:
         user = request.user
         income = generate_income_statement(user)
-        # cashflow_statement = generate_cashflow_statement(user, start_date, end_date, income_statement)
+        cashflow = generate_cashflow_statement(user, income)
+        print(cashflow)
 
         income_table = [
             {
@@ -103,9 +104,19 @@ def home(request):
         ]
         income_dates = income.index.values
 
+        cashflow_table = [
+            {
+                'metric': name,
+                'data': col.values
+            } for name, col in cashflow.items()
+        ]
+        cashflow_dates = cashflow.index.values
+
         ctx = {
             'income_table': income_table,
-            'income_dates': income_dates
+            'income_dates': income_dates,
+            'cashflow_table': cashflow_table,
+            'cashflow_dates': cashflow_dates
         }
 
         return render(request, 'mysite/home.html', ctx)

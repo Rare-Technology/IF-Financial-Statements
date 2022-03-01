@@ -137,6 +137,125 @@ def generate_income_statement(user):
 
     return income
 
-def generate_cashflow_statement(user, income_statement):
-    """ Calculate accounts recievable/payable and produce dictionary of figures """
-    pass
+def accounts_receivable_summary(buyer):
+    owed_data = FishdataExpense.objects.filter(
+        buyer = buyer,
+        expense_type = 1, # cash for fish and loans
+    )
+    received_data = FishdataExpense.objects.filter(
+        buyer = buyer,
+        expense_type = 0,
+        ispayment = True # payments made by fisher
+    )
+
+    if len(owed_data) == 0: # TODO write this better... can probably initiate these lists as [] then append data
+        owed = []
+        owed_dates = []
+    else:
+        loan_terms = ['loan', 'prestamo', 'pinjaman']
+        # keep only the rows that are related to loans i.e. have 'loan' or translations in the `note` field
+        owed_data_filter = []
+        # this is not very elegant but can't have these conditionals in one line when notes
+        # is None since .lower() cannot be used on None
+        for obj in owed_data:
+            if obj.notes is not None:
+                if any(term for term in loan_terms if term in obj.notes.lower()):
+                    owed_data_filter.append(obj)
+        owed = [obj.total_price for obj in owed_data_filter]
+        owed_dates = [obj.date for obj in owed_data_filter]
+    if len(received_data) == 0:
+        received = []
+        receieved_dates = []
+    else:
+        received = [obj.total_price for obj in received_data]
+        received_dates = [obj.date for obj in received_data]
+
+    owed_transactions = pd.DataFrame(data = {
+        'Owed': owed,
+        'date': owed_dates
+    })
+    received_transactions = pd.DataFrame(data = {
+        'Received': received,
+        'date': received_dates
+    })
+
+    owed_transactions['date'] = owed_transactions['date'].apply(lambda x: x.date().replace(day = 1))
+    received_transactions['date'] = received_transactions['date'].apply(lambda x: x.date().replace(day = 1))
+
+    owed_summary = owed_transactions.groupby(by = 'date').sum()
+    received_summary = received_transactions.groupby(by = 'date').sum()
+
+    summary = owed_summary.join(received_summary, how = 'outer').fillna(0)
+    summary['Accounts Receivable'] = summary['Owed'] - summary['Received']
+    print(summary)
+    return summary
+
+def accounts_payable_summary(buyer):
+    debt_data = FishdataCatch.objects.filter(buyer = buyer)
+    paid_data = FishdataExpense.objects.filter(
+        buyer = buyer,
+        expense_type = 1 # cash for fish and loans
+    )
+
+    if len(paid_data) == 0:
+        paid = []
+        paid_dates = []
+    else:
+        loan_terms = ['loan', 'prestamo', 'pinjaman']
+        # remove rows which represent issuing loans
+        paid_data_filter = []
+        for obj in paid_data:
+            if obj.notes is None:
+                paid_data_filter.append(obj)
+            else:
+                if not any(term for term in loan_terms if term in obj.notes.lower()):
+                    paid_data_filter.append(obj)
+        paid = [obj.total_price for obj in paid_data_filter]
+        paid_dates = [obj.date for obj in paid_data_filter]
+    if len(debt_data) == 0:
+        debt = []
+        debt_dates = []
+    else:
+        debt = [json.loads(obj.data)['total_price'] for obj in debt_data]
+        debt_dates = [obj.date for obj in debt_data]
+
+    paid_transactions = pd.DataFrame(data = {
+        'Paid': paid,
+        'date': paid_dates
+    })
+    debt_transactions = pd.DataFrame(data = {
+        'Debt': debt,
+        'date': debt_dates
+    })
+
+    paid_transactions['date'] = paid_transactions['date'].apply(lambda x: x.date().replace(day = 1))
+    debt_transactions['date'] = debt_transactions['date'].apply(lambda x: x.date().replace(day = 1))
+
+    paid_summary = paid_transactions.groupby(by = 'date').sum()
+    debt_summary = debt_transactions.groupby(by = 'date').sum()
+
+    summary = paid_summary.join(debt_summary, how = 'outer').fillna(0)
+    summary['Accounts Payable'] = summary['Debt'] - summary['Paid']
+
+    return summary
+
+def generate_cashflow_statement(user, income):
+    """ Calculate accounts receivable/payable and produce dictionary of figures """
+    of_user = AuthUser.objects.get(username = user.username)
+    buyer = FishdataBuyer.objects.get(user = of_user)
+
+    accounts_receivable = accounts_receivable_summary(buyer)
+    accounts_payable = accounts_payable_summary(buyer)
+
+    cashflow = accounts_payable.join(accounts_receivable, how='outer').fillna(0)
+    cashflow.index = cashflow.index.map(lambda x: x.strftime('%b %Y'))
+    cashflow = cashflow.join(income, how = 'outer').fillna(0)
+    cashflow['Total Cash'] = cashflow['Profit_Total'] - cashflow['Accounts Receivable'] + cashflow['Accounts Payable']
+    cashflow = cashflow[['Profit_Total', 'Accounts Receivable', 'Accounts Payable', 'Total Cash']]
+    cashflow = cashflow.rename({
+        'Profit_Total': 'Net income',
+        'Accounts Receivable': 'Accounts receivable',
+        'Accounts Payable': 'Accounts payable',
+        'Total Cash': 'Total cash'
+    }, axis = 1)
+    return cashflow

@@ -25,3 +25,24 @@
     {% endfor %}
   </tbody>
 </table>
+
+<table id="cashflow-table" class="table table-striped" style="width: 100%">
+  <thead>
+    <tr>
+      <th>Date</th>
+      {% for date in cashflow_dates %}
+        <th>{{ date }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in cashflow_table %}
+    <tr>
+      <td>{{ row.metric }}</td>
+      {% for x in row.data %}
+        <td> {{ x }}</td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
