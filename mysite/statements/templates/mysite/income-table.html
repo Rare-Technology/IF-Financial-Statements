@@ -1,0 +1,27 @@
+{% load static %}
+<head>
+  <link rel="stylesheet" href="{% static 'css/data-table.css' %}">
+</head>
+
+<table id="income-table" class="table table-striped" style="width: 100%">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Source</th>
+      {% for date in income_dates %}
+        <th>{{ date }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in income_table %}
+    <tr>
+      <td>{{ row.metric }}</td>
+      <td>{{ row.source }}</td>
+      {% for x in row.data %}
+        <td> {{ x }}</td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

@@ -24,11 +24,11 @@
           <div class="row">
             <div class="col-6 col-md-2">
               <small class="d-block text-muted">From</small>
-              <input id="start-date" class="statement-option" type="date" name="start-date" disabled style="display:inline">
+              <input id="start-date" type="date" name="start-date" style="display:inline">
             </div>
             <div class="col-6 col-md-2">
               <small class="d-block text-muted">To</small>
-              <input id="end-date" class="statement-option" type="date" name="end-date" disabled style="display:inline">
+              <input id="end-date" type="date" name="end-date" style="display:inline">
             </div>
             <div class="col-12 col-md-2 my-2 d-grid my-md-3">
               <button id="view-statements" class="btn btn-primary statement-option" target="_blank" type="button" disabled>View Statements</button>
@@ -38,7 +38,7 @@
           <div id="export-buttons" class="btn-group d-grid gap-2 d-md-block">
             <!-- <button class="btn btn-outline-secondary statement-option" type="button" disabled><a class="export-link" href="{% url 'export_pdf' %}" target="_blank" role="button">Export to PDF</a></button>
             <button class="btn btn-outline-secondary statement-option" type="button" disabled><a class="export-link" href="{% url 'export_csv' %}" target="_blank" role="button">Export to Excel</a></button> -->
-            <button class="btn btn-outline-secondary dropdown-toggle statement-option" type="button" id="email-button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" disabled>Email</button>
+            <!-- <button class="btn btn-outline-secondary dropdown-toggle statement-option" type="button" id="email-button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" disabled>Email</button>
               <ul class="dropdown-menu" aria-labelledby="email-button">
                 <form action="/send_email/" method="POST">
                   {% csrf_token %}
@@ -51,16 +51,21 @@
                     <label class="form-check-label" for="email-check-2">Excel</label>
                   </li>
                   <li><hr class="dropdown-divider"></li>
+                    <input type="text" name="get_email" value="Enter email">
+                    <label for="get_email">To:</label>
                   <li><button class="btn btn-link" type="submit">Send email</button></li>
                 </form>
-              </ul>
+              </ul> -->
               <!-- <button class="btn btn-outline-secondary statement-option" type="button" disabled><a class="export-link" href="{% url 'print_statement' %}" target="_blank" role="button">Print</a></button> -->
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div id="catches-div" class="list-group-item" hidden>
-    {% include 'mysite/table.html' %}
+  <div id="income-div" class="list-group-item" hidden>
+    {% include 'mysite/income-table.html' %}
+  </div>
+  <div id="cashflow-div" class="list-group-item" hidden>
+    {% include 'mysite/cashflow-table.html' %}
   </div>
 </div>

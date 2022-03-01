@@ -198,9 +198,10 @@ def send_email(request):
             "Ourfish Financial Statement",
             "Here is your financial statement for the period from ... to ...",
             EMAIL_HOST_USER,
-            [request.user.email]
+            [request.POST['get_email']]
         )
 
+        # TODO rewrite this
         # The conditionals on the next if statements look a bit weird but I prefered
         # to write it this way rather than checking the value of eg request.POST['attach_pdf'].
         # Without using a sneaky/hack-y trick, unchecked boxes from the form will not pass in POST

@@ -1,11 +1,15 @@
 const inputStatements = document.querySelectorAll(".input-statements");
-const inputStatements1 = inputStatements[0];
-const inputStatements2 = inputStatements[1];
+const incomeCheck = inputStatements[0];
+const cashflowCheck = inputStatements[1];
 const viewStatements = document.querySelector("#view-statements");
-const statementOptions = document.querySelectorAll(".statement-option");
-const catchesTable = document.querySelector("#catches-div");
+const statementOptions = document.querySelectorAll(".statement-option"); // may not need this, except for email
+const incomeTable = document.querySelector("#income-div");
+const cashflowTable = document.querySelector("#cashflow-div");
 
-inputStatements1.addEventListener("click", function() {
+// Create two event listeners to enable statement-option (email btn) when eiter input is checked.
+// Disable if both are not checked
+// First event listener
+incomeCheck.addEventListener("click", function() {
   let num_checked = 0;
   inputStatements.forEach(element => num_checked = num_checked + element.checked);
 
@@ -15,12 +19,13 @@ inputStatements1.addEventListener("click", function() {
     statementOptions.forEach(element => element.disabled = false);
   };
 
-  if (!inputStatements1.checked) {
-    catchesTable.hidden = true;
-  };
+  // if (!inputStatements1.checked) {
+  //   catchesTable.hidden = true;
+  // };
 });
 
-inputStatements2.addEventListener("click", function() {
+// Second event listener (uncomment when reimplementing email button)
+cashflowCheck.addEventListener("click", function() {
   let num_checked = 0;
   inputStatements.forEach(element => num_checked = num_checked + element.checked);
 
@@ -32,7 +37,14 @@ inputStatements2.addEventListener("click", function() {
 });
 
 viewStatements.addEventListener("click", function() {
-  if (inputStatements1.checked) {
-    catchesTable.hidden = false;
+  if (incomeCheck.checked) {
+    incomeTable.hidden = false;
+  } else {
+    incomeTable.hidden = true;
+  };
+  if (cashflowCheck.checked) {
+    cashflowTable.hidden = false;
+  } else {
+    cashflowTable.hidden = true;
   };
 });
