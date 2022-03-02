@@ -27,7 +27,7 @@ cfg.read(BASE_DIR / 'mysite/secret.ini')
 SECRET_KEY = cfg.get('key', 'SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['ourfish-financial.herokuapp.com', '127.0.0.1']
 
