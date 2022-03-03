@@ -20,9 +20,11 @@ function bY_to_iso (date) {
   return isodate
 }
 
+let income_table, cashflow_table
+
 $(document).ready(function() {
     // DataTables initialisation for income
-    let income_table = $('#income-table').DataTable({
+    income_table = $('#income-table').DataTable({
          dom: 'Bfrtip',
          buttons: [
            {
@@ -33,6 +35,7 @@ $(document).ready(function() {
            },
            {
              extend: 'pdf',
+             orientation: 'landscape',
              exportOptions: {
                columns: [1, ':visible']
              }
@@ -42,7 +45,61 @@ $(document).ready(function() {
              exportOptions: {
                columns: [1, ':visible']
              }
-           }
+           },
+           {
+                "text" : 'Email',
+                action : function(e, dt, node, conf) {
+                    var data = income_table.buttons.exportData({
+                        "stripHtml" : true,
+                        "columns" : ':visible',
+                        // "modifier" : {
+                        //     "selected" : true
+                        // }
+                    });
+                    console.log(data);
+                    var headerArray = data.header;
+                    var rowsArray = data.body;
+                    var rowItem = '';
+                    var innerRowItem = '';
+
+                    for (var h = 0, hen = rowsArray.length; h < hen; h++) {
+                        var innerRowsArray = rowsArray[h];
+
+                        for (var i = 0, ien = innerRowsArray.length; i < ien; i++) {
+                            var outerCount = [i];
+
+                            var checker = 'false';
+                            for (var j = 0, jen = headerArray.length; j < ien; j++) {
+                                if ( outerCount = [j] & checker == 'false') {
+                                    checker = 'true';
+                                    innerRowItem += headerArray[i];
+                                }
+                            }
+
+                            if (innerRowsArray[i] != '') {
+                                innerRowItem += ': ';
+                            }
+
+                            innerRowItem += innerRowsArray[i];
+
+                            if (innerRowsArray[i] != '') {
+                                innerRowItem += '<br>';
+                            }
+
+                        };
+
+                        innerRowItem += '<br>';
+
+                    };
+                    $('#emailForm').modal({
+                        showClose : true,
+                        fadeDuration : 250,
+                        fadeDelay : 1.5
+                    });
+                                        // tinymce.activeEditor.execCommand('mceInsertContent', false, innerRowItem);
+                    //$("textarea#mce-content-body").val(innerRowItem);
+                }
+            }
          ],
          order: [[1, 'asc']],
          ordering: false,
@@ -59,7 +116,7 @@ $(document).ready(function() {
     $('#income-table').wrap("<div class='scrollTable'></div>");
 
     // and now cashflow
-    let cashflow_table = $('#cashflow-table').DataTable({
+    cashflow_table = $('#cashflow-table').DataTable({
          dom: 'Bfrtip',
          buttons: [
            {
@@ -174,3 +231,11 @@ $(document).ready(function() {
         });
     });
 });
+
+// TODO use this function in template to get the DataTable data and pass it
+// to a form. Then have export options use views with POST data.
+function getTableData(table) {
+  return table.buttons.exportData({
+    columns: ':visible'
+  });
+}
