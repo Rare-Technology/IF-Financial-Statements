@@ -22,6 +22,23 @@ function bY_to_iso (date) {
 
 let income_table, cashflow_table
 
+$.fn.dataTable.ext.buttons.jspdf = {
+    text: 'PDF',
+    action: function ( e, dt, node, config ) {
+        let doc = jspdf.jsPDF('l');
+        let dt_id = '#' + dt.context[0].nTable.id;
+        doc.text(config.config.title, 120, 20);
+        doc.autoTable({
+          html: dt_id,
+          horizontalPageBreak: true,
+          horizontalPageBreakRepeat: 0,
+          margin: {top: 30}
+        })
+        doc.save('table.pdf');
+    }
+};
+
+
 $(document).ready(function() {
     // DataTables initialisation for income
     income_table = $('#income-table').DataTable({
@@ -34,10 +51,9 @@ $(document).ready(function() {
              }
            },
            {
-             extend: 'pdf',
-             orientation: 'landscape',
-             exportOptions: {
-               columns: [1, ':visible']
+             extend: 'jspdf',
+             config: {
+               title: "Income Statement"
              }
            },
            {
@@ -126,9 +142,9 @@ $(document).ready(function() {
              }
            },
            {
-             extend: 'pdf',
-             exportOptions: {
-               columns: ':visible'
+             extend: 'jspdf',
+             config: {
+               title: "Cashflow Statement"
              }
            },
            {

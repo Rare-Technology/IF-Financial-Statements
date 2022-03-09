@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth.models import User
-from ourfish.models import AuthUser
+from ourfish.models import AuthUser, FishdataBuyer
 from django.contrib import messages
 from django.template.loader import get_template
 from django.core.mail import EmailMessage
@@ -15,7 +15,7 @@ from .forms import UpdateAccountForm
 import csv
 import pandas as pd
 from datetime import date
-from statements.utils import generate_income_statement, generate_cashflow_statement
+from statements.utils import generate_income_statement, generate_cashflow_statement, format_data
 
 
 
@@ -91,15 +91,17 @@ def deleteAccount(request):
 def home(request):
     if request.user.is_authenticated:
         user = request.user
-        income = generate_income_statement(user)
-        cashflow = generate_cashflow_statement(user, income)
-        print(cashflow)
+        of_user = AuthUser.objects.get(username = user.username)
+        buyer = FishdataBuyer.objects.get(user = of_user)
+
+        income = generate_income_statement(buyer)
+        cashflow = generate_cashflow_statement(buyer, income)
 
         income_table = [
             {
                 'metric': name.split('_')[0],
                 'source': name.split('_')[1],
-                'data': col.values
+                'data': col.apply(lambda x: format_data(buyer, x)).values
             } for name, col in income.items()
         ]
         income_dates = income.index.values
@@ -107,7 +109,7 @@ def home(request):
         cashflow_table = [
             {
                 'metric': name,
-                'data': col.values
+                'data': col.apply(lambda x: format_data(buyer, x)).values
             } for name, col in cashflow.items()
         ]
         cashflow_dates = cashflow.index.values

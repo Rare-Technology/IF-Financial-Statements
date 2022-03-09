@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 import json
+from babel.numbers import format_currency
 
 def fish_profit(buyer):
     """Calculate profit from fish transactions.
@@ -120,11 +121,8 @@ def supplies_profit(buyer):
 
     return supplies_income
 
-def generate_income_statement(user):
+def generate_income_statement(buyer):
     """ Use fish_profit and supplies_profit to produce a dictionary of figures """
-    of_user = AuthUser.objects.get(username = user.username)
-    buyer = FishdataBuyer.objects.get(user = of_user)
-
     fish_income = fish_profit(buyer)
     supplies_income = supplies_profit(buyer)
 
@@ -239,11 +237,8 @@ def accounts_payable_summary(buyer):
 
     return summary
 
-def generate_cashflow_statement(user, income):
+def generate_cashflow_statement(buyer, income):
     """ Calculate accounts receivable/payable and produce dictionary of figures """
-    of_user = AuthUser.objects.get(username = user.username)
-    buyer = FishdataBuyer.objects.get(user = of_user)
-
     accounts_receivable = accounts_receivable_summary(buyer)
     accounts_payable = accounts_payable_summary(buyer)
 
@@ -259,3 +254,25 @@ def generate_cashflow_statement(user, income):
         'Total Cash': 'Total cash'
     }, axis = 1)
     return cashflow
+
+locale_dict = {
+# Map the country from OF user data to locale strings that can be read by babel
+# There should be a better way to do this, this is very manual and will have to
+# be modified whenever country info from OF changes
+    'United States of America': 'en_US',
+    'Indonesia': 'id_ID'
+}
+
+def format_data(buyer, data):
+    try:
+        buyer_locale = locale_dict[buyer.installation.country.name]
+    except KeyError: # either missing country info in the data or country info is not in locale_dict
+        buyer_locale = 'en_US'
+
+    # Don't actually need currency symbol so it's left blank here, but format_currency
+    # is used over format_decimal since it automatically truncates the decimal places
+    out = format_currency(data, '', locale = buyer_locale)
+    if out[0] == '-': # negative
+        out = '(' + out[1:] + ')'
+
+    return out
