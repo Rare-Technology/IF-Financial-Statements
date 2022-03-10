@@ -130,6 +130,11 @@ def generate_income_statement(buyer):
     income['Revenue_Total'] = income['Revenue_Fish'] + income['Revenue_Supplies']
     income['Expenses_Total'] = income['Expenses_Fish'] + income['Expenses_Supplies']
     income['Profit_Total'] = income['Profit_Fish'] + income['Profit_Supplies']
+    income = income.rename({
+        'Profit_Fish': 'Profit (Loss)_Fish',
+        'Profit_Supplies': 'Profit (Loss)_Supplies',
+        'Profit_Total': 'Net income_Total'
+    }, axis = 1)
 
     income.index = income.index.map(lambda x: x.strftime('%b %Y'))
 
@@ -185,7 +190,7 @@ def accounts_receivable_summary(buyer):
 
     summary = owed_summary.join(received_summary, how = 'outer').fillna(0)
     summary['Accounts Receivable'] = summary['Owed'] - summary['Received']
-    print(summary)
+
     return summary
 
 def accounts_payable_summary(buyer):
@@ -245,14 +250,15 @@ def generate_cashflow_statement(buyer, income):
     cashflow = accounts_payable.join(accounts_receivable, how='outer').fillna(0)
     cashflow.index = cashflow.index.map(lambda x: x.strftime('%b %Y'))
     cashflow = cashflow.join(income, how = 'outer').fillna(0)
-    cashflow['Total Cash'] = cashflow['Profit_Total'] - cashflow['Accounts Receivable'] + cashflow['Accounts Payable']
-    cashflow = cashflow[['Profit_Total', 'Accounts Receivable', 'Accounts Payable', 'Total Cash']]
+    cashflow['Total Cash'] = cashflow['Net income_Total'] - cashflow['Accounts Receivable'] + cashflow['Accounts Payable']
+    cashflow = cashflow[['Net income_Total', 'Accounts Receivable', 'Accounts Payable', 'Total Cash']]
     cashflow = cashflow.rename({
-        'Profit_Total': 'Net income',
+        'Net income_Total': 'Net income',
         'Accounts Receivable': 'Accounts receivable',
         'Accounts Payable': 'Accounts payable',
         'Total Cash': 'Total cash'
     }, axis = 1)
+
     return cashflow
 
 locale_dict = {

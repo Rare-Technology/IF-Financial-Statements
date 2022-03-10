@@ -3,6 +3,10 @@
   <link rel="stylesheet" href="{% static 'css/data-table.css' %}">
 </head>
 
+<h1 style="text-align: center">Cash Flow Statement</h1>
+<div class="lead" style="text-align: center">
+  {{ user.first_name }} {{ user.last_name }}, <span class="start-date-display"></span> - <span class="end-date-display"></span>
+</div>
 <table id="cashflow-table" class="table table-striped" style="width: 100%">
   <thead>
     <tr>
