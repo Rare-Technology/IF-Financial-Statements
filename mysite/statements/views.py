@@ -15,7 +15,7 @@ from .forms import UpdateAccountForm
 import csv
 import pandas as pd
 from datetime import date
-from statements.utils import generate_income_statement, generate_cashflow_statement, format_data
+from statements.utils import generate_income_statement, generate_cashflow_statement, format_data, get_currency
 
 
 
@@ -113,12 +113,14 @@ def home(request):
             } for name, col in cashflow.items()
         ]
         cashflow_dates = cashflow.index.values
+        currency = get_currency(buyer)
 
         ctx = {
             'income_table': income_table,
             'income_dates': income_dates,
             'cashflow_table': cashflow_table,
-            'cashflow_dates': cashflow_dates
+            'cashflow_dates': cashflow_dates,
+            'currency': currency
         }
 
         return render(request, 'mysite/home.html', ctx)

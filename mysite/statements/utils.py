@@ -8,6 +8,7 @@ import numpy as np
 from datetime import datetime
 import json
 from babel.numbers import format_currency
+from babel.core import get_global
 
 def fish_profit(buyer):
     """Calculate profit from fish transactions.
@@ -269,6 +270,15 @@ locale_dict = {
     'Indonesia': 'id_ID'
 }
 
+currency_dict = {
+    # similar to locale_dict; at some point write this in a more generalizable way.
+    # Tried using babel.core.get_global('territory_currencies') but it returns a list
+    # of historical currencies not necessarily in chronological order, so would
+    # have to think of how to get the right currency every time
+    'en_US': 'USD',
+    'id_ID': 'IDR'
+}
+
 def format_data(buyer, data):
     try:
         buyer_locale = locale_dict[buyer.installation.country.name]
@@ -282,3 +292,14 @@ def format_data(buyer, data):
         out = '(' + out[1:] + ')'
 
     return out
+
+def get_currency(buyer):
+        try:
+            buyer_locale = locale_dict[buyer.installation.country.name]
+        except KeyError: # either missing country info in the data or country info is not in locale_dict
+            buyer_locale = 'en_US'
+
+        try:
+            return currency_dict[buyer_locale]
+        except KeyError:
+            return currency_dict['en_US']

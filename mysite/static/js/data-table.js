@@ -72,7 +72,6 @@ $(document).ready(function() {
                         //     "selected" : true
                         // }
                     });
-                    console.log(data);
                     var headerArray = data.header;
                     var rowsArray = data.body;
                     var rowItem = '';
@@ -164,7 +163,7 @@ $(document).ready(function() {
 
     // Initial column filter and removing sorting
     income_table.columns().every( function() {
-      if (this.header().textContent != "Type") {
+      if (!this.header().textContent.includes('Type')) {
         let min = new Date($('#start-date').val());
         let max = new Date($('#end-date').val());
         let isodate = bY_to_iso(this.header().textContent);
@@ -185,7 +184,7 @@ $(document).ready(function() {
 
     // and cashflow
     cashflow_table.columns().every( function() {
-      if (this.header().textContent != "Type") {
+      if (!this.header().textContent.includes('Type')) {
         let min = new Date($('#start-date').val());
         let max = new Date($('#end-date').val());
         let isodate = bY_to_iso(this.header().textContent);
@@ -207,7 +206,7 @@ $(document).ready(function() {
     // Refilter the tables
     $('#start-date, #end-date').on('change', function () {
         income_table.columns().every( function() {
-          if (this.header().textContent != "Type") {
+          if (!this.header().textContent.includes('Type')) {
             let min = new Date($('#start-date').val());
             let max = new Date($('#end-date').val());
             let isodate = bY_to_iso(this.header().textContent);
@@ -227,7 +226,7 @@ $(document).ready(function() {
         });
 
         cashflow_table.columns().every( function() {
-          if (this.header().textContent != "Type") {
+          if (!this.header().textContent.includes('Type')) {
             let min = new Date($('#start-date').val());
             let max = new Date($('#end-date').val());
             let isodate = bY_to_iso(this.header().textContent);
