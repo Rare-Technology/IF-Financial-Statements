@@ -13,7 +13,7 @@
       <th>Type ({{ currency }})</th>
       <th>Source</th>
       {% for date in income_dates %}
-        <th>{{ date }}</th>
+        <th class="dt-head-right">{{ date }}</th>
       {% endfor %}
     </tr>
   </thead>
@@ -23,7 +23,7 @@
       <td>{{ row.metric }}</td>
       <td>{{ row.source }}</td>
       {% for x in row.data %}
-        <td> {{ x }}</td>
+        <td class="dt-body-right"> {{ x }}</td>
       {% endfor %}
     </tr>
     {% endfor %}

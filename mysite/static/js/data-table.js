@@ -13,11 +13,13 @@ const months = {
   'Dec': '12'
 };
 
-function bY_to_iso (date) {
+function bY_to_date (date) {
   const date_split = date.split(' '); // ['Jan', 2022]
-  const isodate = [date_split[1], months[date_split[0]], '01'].join('-');
+  const isodate = [date_split[1], months[date_split[0]], '01'].join('-'); // 2022-01-01
+  let out = new Date(isodate); // Date Fri Dec 31 2021 19:00:00 GMT-0500 (Eastern Standard Time)
+  out.setHours(out.getHours() + 5); // Date Sat Jan 01 2022 00:00:00 GMT-0500 (Eastern Standard Time)
 
-  return isodate
+  return out
 }
 
 let income_table, cashflow_table
@@ -29,6 +31,8 @@ $.fn.dataTable.ext.buttons.jspdf = {
         let dt_id = '#' + dt.context[0].nTable.id;
         doc.text(config.config.title, 120, 20);
         doc.autoTable({
+          styles: {halign: 'right'},
+          columnStyles: {0: {halign: 'left'}},
           html: dt_id,
           horizontalPageBreak: true,
           horizontalPageBreakRepeat: 0,
@@ -48,7 +52,8 @@ $(document).ready(function() {
              extend: 'excel',
              exportOptions: {
                columns: [1, ':visible']
-             }
+             },
+             title: "Income Statement"
            },
            {
              extend: 'jspdf',
@@ -138,12 +143,13 @@ $(document).ready(function() {
              extend: 'excel',
              exportOptions: {
                columns: ':visible'
-             }
+             },
+             title: "Cash Flow Statement"
            },
            {
              extend: 'jspdf',
              config: {
-               title: "Cashflow Statement"
+               title: "Cash Flow Statement"
              }
            },
            {
@@ -164,11 +170,11 @@ $(document).ready(function() {
     // Initial column filter and removing sorting
     income_table.columns().every( function() {
       if (!this.header().textContent.includes('Type')) {
-        let min = new Date($('#start-date').val());
-        let max = new Date($('#end-date').val());
-        let isodate = bY_to_iso(this.header().textContent);
-        let date = new Date(isodate);
-
+        let min = $('#start-date').datepicker('getDate');
+        let max = $('#end-date').datepicker('getDate');
+        let date = bY_to_date(this.header().textContent);
+        console.log('min:' + min);
+        console.log('date:' + date);
         if (
             ( min === null && max === null ) ||
             ( min === null && date <= max ) ||
@@ -185,10 +191,9 @@ $(document).ready(function() {
     // and cashflow
     cashflow_table.columns().every( function() {
       if (!this.header().textContent.includes('Type')) {
-        let min = new Date($('#start-date').val());
-        let max = new Date($('#end-date').val());
-        let isodate = bY_to_iso(this.header().textContent);
-        let date = new Date(isodate);
+        let min = $('#start-date').datepicker('getDate');
+        let max = $('#end-date').datepicker('getDate');
+        let date = bY_to_date(this.header().textContent);
 
         if (
             ( min === null && max === null ) ||
@@ -207,10 +212,9 @@ $(document).ready(function() {
     $('#start-date, #end-date').on('change', function () {
         income_table.columns().every( function() {
           if (!this.header().textContent.includes('Type')) {
-            let min = new Date($('#start-date').val());
-            let max = new Date($('#end-date').val());
-            let isodate = bY_to_iso(this.header().textContent);
-            let date = new Date(isodate);
+            let min = $('#start-date').datepicker('getDate');
+            let max = $('#end-date').datepicker('getDate');
+            let date = bY_to_date(this.header().textContent);
 
             if (
                 ( min === null && max === null ) ||
@@ -227,10 +231,9 @@ $(document).ready(function() {
 
         cashflow_table.columns().every( function() {
           if (!this.header().textContent.includes('Type')) {
-            let min = new Date($('#start-date').val());
-            let max = new Date($('#end-date').val());
-            let isodate = bY_to_iso(this.header().textContent);
-            let date = new Date(isodate);
+            let min = $('#start-date').datepicker('getDate');
+            let max = $('#end-date').datepicker('getDate');
+            let date = bY_to_date(this.header().textContent);
 
             if (
                 ( min === null && max === null ) ||

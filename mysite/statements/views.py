@@ -16,8 +16,8 @@ import csv
 import pandas as pd
 from datetime import date
 from statements.utils import generate_income_statement, generate_cashflow_statement, format_data, get_currency
-
-
+import json
+import numpy as np
 
 
 
@@ -122,6 +122,9 @@ def home(request):
             'cashflow_dates': cashflow_dates,
             'currency': currency
         }
+
+    # with open('ctx.json', 'r', encoding='UTF-8') as f:
+    #     ctx = json.load(f)
 
         return render(request, 'mysite/home.html', ctx)
     else:
