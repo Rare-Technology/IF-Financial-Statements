@@ -4,10 +4,11 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm
 from django.contrib.auth.models import User
-from ourfish.models import AuthUser, FishdataBuyer
 from django.contrib import messages
 from django.template.loader import get_template
 from django.core.mail import EmailMessage
+from django.utils.translation import get_language, activate, gettext as _
+from ourfish.models import AuthUser, FishdataBuyer
 from mysite.settings import EMAIL_HOST_USER
 from xhtml2pdf import pisa
 from tempfile import TemporaryFile
@@ -15,11 +16,9 @@ from .forms import UpdateAccountForm
 import csv
 import pandas as pd
 from datetime import date
-from statements.utils import generate_income_statement, generate_cashflow_statement, format_data, get_currency
+from statements.utils import generate_income_statement, generate_cashflow_statement, format_data, get_currency, translate_date
 import json
 import numpy as np
-
-
 
 # Create your views here.
 def loginAccount(request):
@@ -31,7 +30,7 @@ def loginAccount(request):
             login(request, user)
             return redirect('home')
         else:
-            messages.error(request, "Error logging in. Please try again.")
+            messages.error(request, _("Error logging in. Please try again."))
             return redirect('login')
     else:
         return render(request, 'registration/login.html', {})
@@ -104,7 +103,7 @@ def home(request):
                 'data': col.apply(lambda x: format_data(buyer, x)).values
             } for name, col in income.items()
         ]
-        income_dates = income.index.values
+        income_dates = income.index.map(lambda x: translate_date(x)).values
 
         cashflow_table = [
             {
@@ -112,7 +111,7 @@ def home(request):
                 'data': col.apply(lambda x: format_data(buyer, x)).values
             } for name, col in cashflow.items()
         ]
-        cashflow_dates = cashflow.index.values
+        cashflow_dates = cashflow.index.map(lambda x: translate_date(x)).values
         currency = get_currency(buyer)
 
         ctx = {

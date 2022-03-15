@@ -173,8 +173,7 @@ $(document).ready(function() {
         let min = $('#start-date').datepicker('getDate');
         let max = $('#end-date').datepicker('getDate');
         let date = bY_to_date(this.header().textContent);
-        console.log('min:' + min);
-        console.log('date:' + date);
+
         if (
             ( min === null && max === null ) ||
             ( min === null && date <= max ) ||

@@ -3,6 +3,7 @@ from ourfish.models import (
     FishdataCatch, FishdataExpense, FishdataSupplypurchases
 )
 from django.contrib.auth.models import User
+from django.utils.translation import get_language, activate, gettext as _
 import pandas as pd
 import numpy as np
 from datetime import datetime
@@ -132,9 +133,15 @@ def generate_income_statement(buyer):
     income['Expenses_Total'] = income['Expenses_Fish'] + income['Expenses_Supplies']
     income['Profit_Total'] = income['Profit_Fish'] + income['Profit_Supplies']
     income = income.rename({
-        'Profit_Fish': 'Profit (Loss)_Fish',
-        'Profit_Supplies': 'Profit (Loss)_Supplies',
-        'Profit_Total': 'Net income_Total'
+        'Revenue_Fish': _('Revenue_Fish'),
+        'Revenue_Suplies': _('Revenue_Supplies'),
+        'Revenue_Total': _('Revenue_Total'),
+        'Expenses_Fish': _('Expenses_Fish'),
+        'Expenses_Supplies': _('Expenses_Supplies'),
+        'Expenses_Total': _('Expenses_Total'),
+        'Profit_Fish': _('Profit (Loss)_Fish'),
+        'Profit_Supplies': _('Profit (Loss)_Supplies'),
+        'Profit_Total': _('Net income_Total')
     }, axis = 1)
 
     income.index = income.index.map(lambda x: x.strftime('%b %Y'))
@@ -254,10 +261,10 @@ def generate_cashflow_statement(buyer, income):
     cashflow['Total Cash'] = cashflow['Net income_Total'] - cashflow['Accounts Receivable'] + cashflow['Accounts Payable']
     cashflow = cashflow[['Net income_Total', 'Accounts Receivable', 'Accounts Payable', 'Total Cash']]
     cashflow = cashflow.rename({
-        'Net income_Total': 'Net income',
-        'Accounts Receivable': 'Accounts receivable',
-        'Accounts Payable': 'Accounts payable',
-        'Total Cash': 'Total cash'
+        'Net income_Total': _('Net income'),
+        'Accounts Receivable': _('Accounts receivable'),
+        'Accounts Payable': _('Accounts payable'),
+        'Total Cash': _('Total cash')
     }, axis = 1)
 
     return cashflow
@@ -303,3 +310,25 @@ def get_currency(buyer):
             return currency_dict[buyer_locale]
         except KeyError:
             return currency_dict['en_US']
+
+month_translations = {
+    'Jan': _('Jan'),
+    'Feb': _('Feb'),
+    'Mar': _('Mar'),
+    'Apr': _('Apr'),
+    'May': _('May'),
+    'Jun': _('Jun'),
+    'Jul': _('Jul'),
+    'Aug': _('Aug'),
+    'Sep': _('Sep'),
+    'Oct': _('Oct'),
+    'Nov': _('Nov'),
+    'Dec': _('Dec')
+}
+
+def translate_date(month_year):
+    month, year = [s for s in month_year.split(' ')]
+    trans_month = month_translations[month]
+    trans_month_year = ' '.join([trans_month, year])
+
+    return trans_month_year

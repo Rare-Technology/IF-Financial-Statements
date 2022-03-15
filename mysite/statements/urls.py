@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 
+app_name = 'statements'
+
 urlpatterns = [
     path('', views.home, name = 'home'),
     path('view-statement/', views.view_statement, name = 'view_statement'),

@@ -1,5 +1,7 @@
 <!-- templates/mysite/navbar.html -->
 {% load static %}
+{% load i18n %}
+
 <head>
   <link rel="stylesheet" type="text/css" href="{% static 'css/navbar.css' %}">
 </head>
@@ -7,8 +9,27 @@
   <div class="container-fluid">
     <img src="{% static 'images/ff-logo-250x101.png' %}"</img>
     <h2 class="fw-bold mx-5">OurFish Financial Statements</h2>
-    <div class="mx-auto">
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav mb-2 mb-lg-0 ms-auto me-5">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" id="language-dropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {% translate "Language" %}
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="language-dropdown">
+            {% get_current_language as LANGUAGE_CODE %}
+            {% get_available_languages as LANGUAGES %}
+            {% get_language_info_list for LANGUAGES as languages %}
 
+            {% for lang in languages %}
+              <li>
+                <a class="dropdown-item" href="/{{ lang.code }}">
+                  {{ lang.name_local }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </li>
+      </ul>
     </div>
 
     <!-- <div class="collapse navbar-collapse" id="navbar">

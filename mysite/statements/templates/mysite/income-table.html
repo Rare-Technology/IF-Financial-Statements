@@ -1,17 +1,18 @@
 {% load static %}
+{% load i18n %}
 <head>
   <link rel="stylesheet" href="{% static 'css/data-table.css' %}">
 </head>
 
-<h1 style="text-align: center">Income Statement</h1>
+<h1 style="text-align: center">{% trans "Income Statement" %}</h1>
 <div class="lead" style="text-align: center">
   {{ user.first_name }} {{ user.last_name }}, <span class="start-date-display"></span> - <span class="end-date-display"></span>
 </div>
 <table id="income-table" class="table table-striped" style="width: 100%">
   <thead>
     <tr>
-      <th>Type ({{ currency }})</th>
-      <th>Source</th>
+      <th>{% trans "Type" %} ({{ currency }})</th>
+      <th>{% trans "Source" %}</th>
       {% for date in income_dates %}
         <th class="dt-head-right">{{ date }}</th>
       {% endfor %}
