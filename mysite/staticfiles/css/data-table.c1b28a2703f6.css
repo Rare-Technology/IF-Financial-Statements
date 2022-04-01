@@ -1,0 +1,9 @@
+.scrollTable {
+  overflow-x: auto;
+  clear: both;
+}
+
+.freeze-column {
+  position: absolute;
+  left: 0;
+}

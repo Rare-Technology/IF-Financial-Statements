@@ -3,14 +3,14 @@
   <link rel="stylesheet" href="{% static 'css/data-table.css' %}">
 </head>
 
-<h1 style="text-align: center">Cash Flow Statement</h1>
+<h1 style="text-align: center">Cash flow statement from fisheries operations</h1>
 <div class="lead" style="text-align: center">
   {{ user.first_name }} {{ user.last_name }}, <span class="start-date-display"></span> - <span class="end-date-display"></span>
 </div>
 <table id="cashflow-table" class="table table-striped" style="width: 100%">
   <thead>
     <tr>
-      <th>Type ({{ currency }})</th>
+      <th style="width: 150px; background-color: #ffffff">Type ({{ currency }})</th>
       {% for date in cashflow_dates %}
         <th class="dt-head-right">{{ date }}</th>
       {% endfor %}
@@ -19,7 +19,7 @@
   <tbody>
     {% for row in cashflow_table %}
     <tr>
-      <td>{{ row.metric }}</td>
+      <td style="width: 100px">{{ row.metric }}</td>
       {% for x in row.data %}
         <td class="dt-body-right"> {{ x }}</td>
       {% endfor %}

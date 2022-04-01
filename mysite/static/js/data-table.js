@@ -67,73 +67,78 @@ $(document).ready(function() {
                columns: [1, ':visible']
              }
            },
-           {
-                "text" : 'Email',
-                action : function(e, dt, node, conf) {
-                    var data = income_table.buttons.exportData({
-                        "stripHtml" : true,
-                        "columns" : ':visible',
-                        // "modifier" : {
-                        //     "selected" : true
-                        // }
-                    });
-                    var headerArray = data.header;
-                    var rowsArray = data.body;
-                    var rowItem = '';
-                    var innerRowItem = '';
-
-                    for (var h = 0, hen = rowsArray.length; h < hen; h++) {
-                        var innerRowsArray = rowsArray[h];
-
-                        for (var i = 0, ien = innerRowsArray.length; i < ien; i++) {
-                            var outerCount = [i];
-
-                            var checker = 'false';
-                            for (var j = 0, jen = headerArray.length; j < ien; j++) {
-                                if ( outerCount = [j] & checker == 'false') {
-                                    checker = 'true';
-                                    innerRowItem += headerArray[i];
-                                }
-                            }
-
-                            if (innerRowsArray[i] != '') {
-                                innerRowItem += ': ';
-                            }
-
-                            innerRowItem += innerRowsArray[i];
-
-                            if (innerRowsArray[i] != '') {
-                                innerRowItem += '<br>';
-                            }
-
-                        };
-
-                        innerRowItem += '<br>';
-
-                    };
-                    $('#emailForm').modal({
-                        showClose : true,
-                        fadeDuration : 250,
-                        fadeDelay : 1.5
-                    });
-                                        // tinymce.activeEditor.execCommand('mceInsertContent', false, innerRowItem);
-                    //$("textarea#mce-content-body").val(innerRowItem);
-                }
-            }
+           // {
+           //      "text" : 'Email',
+           //      action : function(e, dt, node, conf) {
+           //          var data = income_table.buttons.exportData({
+           //              "stripHtml" : true,
+           //              "columns" : ':visible',
+           //              // "modifier" : {
+           //              //     "selected" : true
+           //              // }
+           //          });
+           //          var headerArray = data.header;
+           //          var rowsArray = data.body;
+           //          var rowItem = '';
+           //          var innerRowItem = '';
+           //
+           //          for (var h = 0, hen = rowsArray.length; h < hen; h++) {
+           //              var innerRowsArray = rowsArray[h];
+           //
+           //              for (var i = 0, ien = innerRowsArray.length; i < ien; i++) {
+           //                  var outerCount = [i];
+           //
+           //                  var checker = 'false';
+           //                  for (var j = 0, jen = headerArray.length; j < ien; j++) {
+           //                      if ( outerCount = [j] & checker == 'false') {
+           //                          checker = 'true';
+           //                          innerRowItem += headerArray[i];
+           //                      }
+           //                  }
+           //
+           //                  if (innerRowsArray[i] != '') {
+           //                      innerRowItem += ': ';
+           //                  }
+           //
+           //                  innerRowItem += innerRowsArray[i];
+           //
+           //                  if (innerRowsArray[i] != '') {
+           //                      innerRowItem += '<br>';
+           //                  }
+           //
+           //              };
+           //
+           //              innerRowItem += '<br>';
+           //
+           //          };
+           //          $('#emailForm').modal({
+           //              showClose : true,
+           //              fadeDuration : 250,
+           //              fadeDelay : 1.5
+           //          });
+           //                              // tinymce.activeEditor.execCommand('mceInsertContent', false, innerRowItem);
+           //          //$("textarea#mce-content-body").val(innerRowItem);
+           //      }
+           //  }
          ],
          order: [[1, 'asc']],
          ordering: false,
          bPaginate: false,
          bInfo: false,
-         rowGroup: {
-           dataSrc: 1
-         },
+         // rowGroup: {
+         //   dataSrc: 1
+         // },
          searching: false,
-         responsive: true
+         responsive: true,
+         scrollX: true,
+         scrollCollapse: true,
+         // scroller: {
+         //   loadingIndicator: true
+         // },
+         fixedColumns: {
+           left: 2
+         }
     });
-
-    // add horizontal scrolling
-    $('#income-table').wrap("<div class='scrollTable'></div>");
 
     // and now cashflow
     cashflow_table = $('#cashflow-table').DataTable({
@@ -163,13 +168,16 @@ $(document).ready(function() {
          bPaginate: false,
          bInfo: false,
          searching: false,
-         responsive: true
+         responsive: true,
+         scrollX: true,
+         fixedColumns: {
+           left: 1
+         }
     });
-    $('#cashflow-table').wrap("<div class='scrollTable'></div>");
 
     // Initial column filter and removing sorting
     income_table.columns().every( function() {
-      if (!this.header().textContent.includes('Type')) {
+      if (!(this.index() in [0,1])) {
         let min = $('#start-date').datepicker('getDate');
         let max = $('#end-date').datepicker('getDate');
         let date = bY_to_date(this.header().textContent);
@@ -189,7 +197,7 @@ $(document).ready(function() {
 
     // and cashflow
     cashflow_table.columns().every( function() {
-      if (!this.header().textContent.includes('Type')) {
+      if (!(this.index() in  [0,1])) {
         let min = $('#start-date').datepicker('getDate');
         let max = $('#end-date').datepicker('getDate');
         let date = bY_to_date(this.header().textContent);
@@ -210,7 +218,7 @@ $(document).ready(function() {
     // Refilter the tables
     $('#start-date, #end-date').on('change', function () {
         income_table.columns().every( function() {
-          if (!this.header().textContent.includes('Type')) {
+          if (!(this.index() in [0,1])) {
             let min = $('#start-date').datepicker('getDate');
             let max = $('#end-date').datepicker('getDate');
             let date = bY_to_date(this.header().textContent);
@@ -229,7 +237,7 @@ $(document).ready(function() {
         });
 
         cashflow_table.columns().every( function() {
-          if (!this.header().textContent.includes('Type')) {
+          if (!(this.index() in [0,1])) {
             let min = $('#start-date').datepicker('getDate');
             let max = $('#end-date').datepicker('getDate');
             let date = bY_to_date(this.header().textContent);

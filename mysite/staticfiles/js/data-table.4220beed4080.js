@@ -125,17 +125,15 @@ $(document).ready(function() {
          ordering: false,
          bPaginate: false,
          bInfo: false,
-         // rowGroup: {
-         //   dataSrc: 1
-         // },
+         rowGroup: {
+           dataSrc: 1
+         },
          searching: false,
-         responsive: true,
-         scrollX: true,
-         scrollCollapse: true,
-         fixedColumns: {
-           left: 2
-         }
+         responsive: true
     });
+
+    // add horizontal scrolling
+    $('#income-table').wrap("<div class='scrollTable'></div>");
 
     // and now cashflow
     cashflow_table = $('#cashflow-table').DataTable({
@@ -165,16 +163,13 @@ $(document).ready(function() {
          bPaginate: false,
          bInfo: false,
          searching: false,
-         responsive: true,
-         scrollX: true,
-         fixedColumns: {
-           left: 2
-         }
+         responsive: true
     });
+    $('#cashflow-table').wrap("<div class='scrollTable'></div>");
 
     // Initial column filter and removing sorting
     income_table.columns().every( function() {
-      if (!(this.index() in [0,1])) {
+      if (!this.header().textContent.includes('Type')) {
         let min = $('#start-date').datepicker('getDate');
         let max = $('#end-date').datepicker('getDate');
         let date = bY_to_date(this.header().textContent);
@@ -194,7 +189,7 @@ $(document).ready(function() {
 
     // and cashflow
     cashflow_table.columns().every( function() {
-      if (!(this.index() in  [0,1])) {
+      if (!this.header().textContent.includes('Type')) {
         let min = $('#start-date').datepicker('getDate');
         let max = $('#end-date').datepicker('getDate');
         let date = bY_to_date(this.header().textContent);
@@ -215,7 +210,7 @@ $(document).ready(function() {
     // Refilter the tables
     $('#start-date, #end-date').on('change', function () {
         income_table.columns().every( function() {
-          if (!(this.index() in [0,1])) {
+          if (!this.header().textContent.includes('Type')) {
             let min = $('#start-date').datepicker('getDate');
             let max = $('#end-date').datepicker('getDate');
             let date = bY_to_date(this.header().textContent);
@@ -234,7 +229,7 @@ $(document).ready(function() {
         });
 
         cashflow_table.columns().every( function() {
-          if (!(this.index() in [0,1])) {
+          if (!this.header().textContent.includes('Type')) {
             let min = $('#start-date').datepicker('getDate');
             let max = $('#end-date').datepicker('getDate');
             let date = bY_to_date(this.header().textContent);

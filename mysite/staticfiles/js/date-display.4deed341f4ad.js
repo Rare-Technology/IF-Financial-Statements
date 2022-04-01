@@ -3,6 +3,7 @@
 // create event listeners and update #start-date-display / #end-date-display dynamically
 $('#start-date').datepicker()
   .on('changeDate', function(e) {
+    console.log("HeLLO");
     const start_date = $('#start-date').datepicker('getDate');
     const options = { month: 'long', year: 'numeric'};
     start_date_text = start_date.toLocaleDateString('en-US', options); // will have to change this when localizing

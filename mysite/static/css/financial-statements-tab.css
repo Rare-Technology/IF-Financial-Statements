@@ -7,3 +7,13 @@
   text-decoration: none;
   color: #fff;
 }
+
+.mobile-msg {
+  display: none;
+}
+
+@media only screen and (max-width: 915px) {
+  .mobile-msg {
+    display: block;
+  }
+}

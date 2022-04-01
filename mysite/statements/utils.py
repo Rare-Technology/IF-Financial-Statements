@@ -134,7 +134,7 @@ def generate_income_statement(buyer):
     income['Profit_Total'] = income['Profit_Fish'] + income['Profit_Supplies']
     income = income.rename({
         'Revenue_Fish': _('Revenue_Fish'),
-        'Revenue_Suplies': _('Revenue_Supplies'),
+        'Revenue_Supplies': _('Revenue_Supplies'),
         'Revenue_Total': _('Revenue_Total'),
         'Expenses_Fish': _('Expenses_Fish'),
         'Expenses_Supplies': _('Expenses_Supplies'),
@@ -258,13 +258,13 @@ def generate_cashflow_statement(buyer, income):
     cashflow = accounts_payable.join(accounts_receivable, how='outer').fillna(0)
     cashflow.index = cashflow.index.map(lambda x: x.strftime('%b %Y'))
     cashflow = cashflow.join(income, how = 'outer').fillna(0)
-    cashflow['Total Cash'] = cashflow['Net income_Total'] - cashflow['Accounts Receivable'] + cashflow['Accounts Payable']
-    cashflow = cashflow[['Net income_Total', 'Accounts Receivable', 'Accounts Payable', 'Total Cash']]
+    cashflow['Total Cash'] = cashflow[_('Net income_Total')] - cashflow['Accounts Receivable'] + cashflow['Accounts Payable']
+    cashflow = cashflow[[_('Net income_Total'), 'Accounts Receivable', 'Accounts Payable', 'Total Cash']]
     cashflow = cashflow.rename({
-        'Net income_Total': _('Net income'),
-        'Accounts Receivable': _('Accounts receivable'),
-        'Accounts Payable': _('Accounts payable'),
-        'Total Cash': _('Total cash')
+        _('Net income_Total'): _('Net income'),
+        'Accounts Receivable': _('Changes in accounts receivable'),
+        'Accounts Payable': _('Changes in accounts payable'),
+        'Total Cash': _('Total cash from fisheries operations')
     }, axis = 1)
 
     return cashflow
@@ -294,7 +294,8 @@ def format_data(buyer, data):
 
     # Don't actually need currency symbol so it's left blank here, but format_currency
     # is used over format_decimal since it automatically truncates the decimal places
-    out = format_currency(data, '', locale = buyer_locale)
+    # The `format` argument rounds values as integers
+    out = format_currency(data, '', format = u'#,##0.', locale = buyer_locale)
     if out[0] == '-': # negative
         out = '(' + out[1:] + ')'
 

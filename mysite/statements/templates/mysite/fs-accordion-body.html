@@ -6,7 +6,7 @@
   <link rel="stylesheet" type="text/css" href="{% static 'css/financial-statements-tab.css' %}">
 </head>
 <div class="list-group my-0">
-  <label class="list-group-item">
+  <!-- <label class="list-group-item">
     <input class="form-check-input flex-shrink-1 input-statements" type="checkbox" value="">
     <span>
       {% trans "Income statement" %}
@@ -19,7 +19,7 @@
       {% trans "Cash Flow statement" %}
       <small class="d-block text-muted">{% trans "Shows how much cash is generated and used over a set period of time." %}</small>
     </span>
-  </label>
+  </label> -->
   <div class="list-group-item">
     <div class="container">
       <div class="row">
@@ -31,17 +31,20 @@
             <input id="end-date" class="form-control" type="text" name="end-date" />
           </div>
         </div>
-        <div class="col-12 col-md-2 my-2 d-grid my-md-3">
-          <button id="view-statements" class="btn btn-primary statement-option" target="_blank" type="button" disabled>{% trans "View Statements" %}</button>
-        </div>
+        <!-- <div class="col-12 col-md-2 my-2 d-grid my-md-3">
+          <button id="view-statements" class="btn btn-primary statement-option" target="_blank" type="button">{% trans "View Statements" %}</button>
+        </div> -->
+      </div>
+      <div class="row text-muted mobile-msg">
+        Mobile users: Horizontal display is recommended for viewing the tables. If there are many months selected, you may have to swipe the table.
       </div>
     </div>
   </div>
-  <div id="income-div" class="list-group-item pb-5" hidden>
+  <div id="income-div" class="list-group-item pb-5">
     {% include 'mysite/income-table.html' %}
   </div>
   <br>
-  <div id="cashflow-div" class="list-group-item pb-5" hidden>
+  <div id="cashflow-div" class="list-group-item pb-5">
     {% include 'mysite/cashflow-table.html' %}
   </div>
 </div>
