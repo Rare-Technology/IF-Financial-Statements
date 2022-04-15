@@ -11,6 +11,21 @@ import json
 from babel.numbers import format_currency
 from babel.core import get_global
 
+"""
+notes
+
+Expense types:
+0 - Cash payment from fisher
+1 - Cash payment or loan to fisher
+2 - Ice
+3 - Fuel
+4 - Custom supply
+
+Expense table flags:
+ispayment - Buyer is paying for fish using e.g. fuel
+isdonation - Buyer is donating supplies to fisher. Not part of income or cashflow
+"""
+
 def fish_profit(buyer):
     """Calculate profit from fish transactions.
 
@@ -27,13 +42,13 @@ def fish_profit(buyer):
     fish_catch = FishdataCatch.objects.filter(buyer = buyer)
     fish_sales = FishdataFishsales.objects.filter(buyer = buyer)
 
-    if len(fish_catch) == 0:
+    if len(fish_sales) == 0:
         revenue = []
         revenue_date = []
     else:
         revenue = [obj.total_price for obj in fish_sales]
         revenue_date = [obj.date for obj in fish_sales]
-    if len(fish_sales) == 0:
+    if len(fish_catch) == 0:
         expenses = []
         expenses_date = []
     else:
@@ -48,7 +63,7 @@ def fish_profit(buyer):
         'Expenses': expenses,
         'date': expenses_date
     }
-
+    print(expenses_transactions)
     revenue_transactions = pd.DataFrame(data = revenue_transactions)
     expenses_transactions = pd.DataFrame(data = expenses_transactions)
 
@@ -57,7 +72,6 @@ def fish_profit(buyer):
 
     fish_revenue = revenue_transactions.groupby(by = 'date').sum()
     fish_expenses = expenses_transactions.groupby(by = 'date').sum()
-    fish_expenses['Expenses'] = fish_expenses['Expenses']
 
     fish_income = fish_revenue.join(fish_expenses, how = 'outer').fillna(0)
     fish_income['Profit'] = fish_income['Revenue'] - fish_income['Expenses']
@@ -80,7 +94,8 @@ def supplies_profit(buyer):
     """
     fishdata_expenses = FishdataExpense.objects.filter(
         buyer = buyer,
-        expense_type__in = [3, 4]
+        expense_type__in = [0, 2, 3, 4],
+        isdonation = False
     )
     supply_purchases = FishdataSupplypurchases.objects.filter(
         buyer = buyer,
@@ -149,37 +164,49 @@ def generate_income_statement(buyer):
     return income
 
 def accounts_receivable_summary(buyer):
-    owed_data = FishdataExpense.objects.filter(
+    owed_data = FishdataExpense.objects.filter( # loans and supply sales
         buyer = buyer,
-        expense_type = 1, # cash for fish and loans
+        expense_type__in = [1, 2, 3, 4],
+        isdonation = False,
+        ispayment = False
     )
-    received_data = FishdataExpense.objects.filter(
+    cash_payment_data = FishdataExpense.objects.filter( # cash payments from fisher
         buyer = buyer,
         expense_type = 0,
-        ispayment = True # payments made by fisher
+        isdonation = False
+    )
+    fish_payment_data = FishdataCatch.objects.filter( # fish payments from fisher
+        buyer = buyer
     )
 
-    if len(owed_data) == 0: # TODO write this better... can probably initiate these lists as [] then append data
-        owed = []
-        owed_dates = []
-    else:
-        loan_terms = ['loan', 'prestamo', 'pinjaman']
-        # keep only the rows that are related to loans i.e. have 'loan' or translations in the `note` field
-        owed_data_filter = []
-        # this is not very elegant but can't have these conditionals in one line when notes
-        # is None since .lower() cannot be used on None
-        for obj in owed_data:
-            if obj.notes is not None:
-                if any(term for term in loan_terms if term in obj.notes.lower()):
-                    owed_data_filter.append(obj)
-        owed = [obj.total_price for obj in owed_data_filter]
-        owed_dates = [obj.date for obj in owed_data_filter]
-    if len(received_data) == 0:
-        received = []
-        receieved_dates = []
-    else:
-        received = [obj.total_price for obj in received_data]
-        received_dates = [obj.date for obj in received_data]
+    owed = []
+    owed_dates = []
+    # loan_terms = ['loan', 'prestamo', 'pinjaman']
+    # # keep only the rows that are related to loans i.e. have 'loan' or translations in the `note` field
+    # owed_data_filter = []
+    # # this is not very elegant but can't have these conditionals in one line when notes
+    # # is None since .lower() cannot be used on None
+    # for obj in owed_data:
+    #     if obj.notes is not None:
+    #         if any(term for term in loan_terms if term in obj.notes.lower()):
+    #             owed_data_filter.append(obj)
+    if len(owed_data) > 0:
+        owed = [obj.total_price for obj in owed_data]#_filter]
+        owed_dates = [obj.date for obj in owed_data]#_filter]
+    print('======owed: ', owed)
+
+    received = []
+    received_dates = []
+    if len(cash_payment_data) > 0:
+        received += [obj.total_price for obj in cash_payment_data]
+        print('======cash received: ', received)
+        received_dates += [obj.date for obj in cash_payment_data]
+    if len(fish_payment_data) > 0:
+        json_data = [json.loads(obj.data) for obj in fish_payment_data]
+        received += [jdata['total_price'] for jdata in json_data if jdata['isPayment'] == True]
+        print('======cash received and fish received as payments: ', received)
+        received_dates += [obj.date for obj in fish_payment_data if json.loads(obj.data)['isPayment'] == True]
+
 
     owed_transactions = pd.DataFrame(data = {
         'Owed': owed,
@@ -197,7 +224,7 @@ def accounts_receivable_summary(buyer):
     received_summary = received_transactions.groupby(by = 'date').sum()
 
     summary = owed_summary.join(received_summary, how = 'outer').fillna(0)
-    summary['Accounts Receivable'] = summary['Owed'] - summary['Received']
+    summary['Accounts Receivable'] =  summary['Owed'] - summary['Received']
 
     return summary
 
@@ -222,13 +249,16 @@ def accounts_payable_summary(buyer):
                 if not any(term for term in loan_terms if term in obj.notes.lower()):
                     paid_data_filter.append(obj)
         paid = [obj.total_price for obj in paid_data_filter]
+        print("======payments and loans to fisher: ", paid)
         paid_dates = [obj.date for obj in paid_data_filter]
     if len(debt_data) == 0:
         debt = []
         debt_dates = []
     else:
-        debt = [json.loads(obj.data)['total_price'] for obj in debt_data]
-        debt_dates = [obj.date for obj in debt_data]
+        json_data = [json.loads(obj.data) for obj in debt_data]
+        debt = [jdata['total_price'] for jdata in json_data if jdata['isPayment'] == False]
+        print("======catch payments due: ", debt)
+        debt_dates = [obj.date for obj in debt_data if json.loads(obj.data)['isPayment'] == False]
 
     paid_transactions = pd.DataFrame(data = {
         'Paid': paid,
@@ -250,6 +280,34 @@ def accounts_payable_summary(buyer):
 
     return summary
 
+def negative_accounts(row):
+    """
+    After joining accounts payable and receivable, check for negative values.
+    Convert negative values to positive to move to the opposite cashflow type.
+
+    Example: Accounts payable on June 2021 is -100 while accounts receivable is 50.
+    Then set accounts payable that month to 0 and accounts receivable to 150.
+
+    This goes into .apply() on `cashflow`, so `row` is a row from `cashflow`
+    """
+    tmp_payable = 0
+    tmp_receivable = 0
+
+    if row['Accounts Payable'] < 0:
+        tmp_payable = -row['Accounts Payable']
+        row['Accounts Payable'] = 0
+
+    if row['Accounts Receivable'] < 0:
+        tmp_receivable = -row['Accounts Receivable']
+        row['Accounts Receivable'] = 0
+
+    row['Accounts Payable'] += tmp_receivable
+    row['Accounts Receivable'] += tmp_payable
+
+    return row
+
+
+
 def generate_cashflow_statement(buyer, income):
     """ Calculate accounts receivable/payable and produce dictionary of figures """
     accounts_receivable = accounts_receivable_summary(buyer)
@@ -257,6 +315,7 @@ def generate_cashflow_statement(buyer, income):
 
     cashflow = accounts_payable.join(accounts_receivable, how='outer').fillna(0)
     cashflow.index = cashflow.index.map(lambda x: x.strftime('%b %Y'))
+    cashflow = cashflow.apply(negative_accounts, axis = 1)
     cashflow = cashflow.join(income, how = 'outer').fillna(0)
     cashflow['Total Cash'] = cashflow[_('Net income_Total')] - cashflow['Accounts Receivable'] + cashflow['Accounts Payable']
     cashflow = cashflow[[_('Net income_Total'), 'Accounts Receivable', 'Accounts Payable', 'Total Cash']]
