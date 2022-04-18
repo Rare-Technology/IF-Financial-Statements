@@ -96,6 +96,9 @@ def home(request):
         income = generate_income_statement(buyer)
         cashflow = generate_cashflow_statement(buyer, income)
 
+        income.index = income.index.map(lambda x: x.strftime('%b %Y'))
+        cashflow.index = cashflow.index.map(lambda x: x.strftime('%b %Y'))
+
         income_table = [
             {
                 'metric': name.split('_')[0],

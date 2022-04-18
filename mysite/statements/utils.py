@@ -63,7 +63,6 @@ def fish_profit(buyer):
         'Expenses': expenses,
         'date': expenses_date
     }
-    print(expenses_transactions)
     revenue_transactions = pd.DataFrame(data = revenue_transactions)
     expenses_transactions = pd.DataFrame(data = expenses_transactions)
 
@@ -159,8 +158,6 @@ def generate_income_statement(buyer):
         'Profit_Total': _('Net income_Total')
     }, axis = 1)
 
-    income.index = income.index.map(lambda x: x.strftime('%b %Y'))
-
     return income
 
 def accounts_receivable_summary(buyer):
@@ -193,19 +190,22 @@ def accounts_receivable_summary(buyer):
     if len(owed_data) > 0:
         owed = [obj.total_price for obj in owed_data]#_filter]
         owed_dates = [obj.date for obj in owed_data]#_filter]
-    print('======owed: ', owed)
 
     received = []
     received_dates = []
     if len(cash_payment_data) > 0:
         received += [obj.total_price for obj in cash_payment_data]
-        print('======cash received: ', received)
         received_dates += [obj.date for obj in cash_payment_data]
     if len(fish_payment_data) > 0:
-        json_data = [json.loads(obj.data) for obj in fish_payment_data]
+        # We are interested in the catch transactions where the fisher uses the fish as cash payment.
+        # This is denoted by the 'isPayment' flag in a FishdataCatch object's `data` column
+        # However, that flag was not introduced until July 2021, so we will filter the catch data to only
+        # those transactions which include an isPayment flag, and from there filter to only the ones with
+        # `isPayment` = True
+        fish_payment_data_isPayment = [obj for obj in fish_payment_data if 'isPayment' in json.loads(obj.data).keys()]
+        json_data = [json.loads(obj.data) for obj in fish_payment_data_isPayment]
         received += [jdata['total_price'] for jdata in json_data if jdata['isPayment'] == True]
-        print('======cash received and fish received as payments: ', received)
-        received_dates += [obj.date for obj in fish_payment_data if json.loads(obj.data)['isPayment'] == True]
+        received_dates += [obj.date for obj in fish_payment_data_isPayment if json.loads(obj.data)['isPayment'] == True]
 
 
     owed_transactions = pd.DataFrame(data = {
@@ -235,10 +235,9 @@ def accounts_payable_summary(buyer):
         expense_type = 1 # cash for fish and loans
     )
 
-    if len(paid_data) == 0:
-        paid = []
-        paid_dates = []
-    else:
+    paid = []
+    paid_dates = []
+    if len(paid_data) > 0:
         loan_terms = ['loan', 'prestamo', 'pinjaman']
         # remove rows which represent issuing loans
         paid_data_filter = []
@@ -248,17 +247,18 @@ def accounts_payable_summary(buyer):
             else:
                 if not any(term for term in loan_terms if term in obj.notes.lower()):
                     paid_data_filter.append(obj)
-        paid = [obj.total_price for obj in paid_data_filter]
-        print("======payments and loans to fisher: ", paid)
-        paid_dates = [obj.date for obj in paid_data_filter]
-    if len(debt_data) == 0:
-        debt = []
-        debt_dates = []
-    else:
-        json_data = [json.loads(obj.data) for obj in debt_data]
-        debt = [jdata['total_price'] for jdata in json_data if jdata['isPayment'] == False]
-        print("======catch payments due: ", debt)
-        debt_dates = [obj.date for obj in debt_data if json.loads(obj.data)['isPayment'] == False]
+        paid += [obj.total_price for obj in paid_data_filter]
+        paid_dates += [obj.date for obj in paid_data_filter]
+    debt = []
+    debt_dates = []
+    if len(debt_data) > 0:
+        # Similar to what was done in the accounts receivable summary func, we first
+        # filter to only catch tranactions that include a `isPayment` flag, then we
+        # filter to only those that have `isPayment` = False
+        debt_data_isPayment = [obj for obj in debt_data if 'isPayment' in json.loads(obj.data).keys()]
+        json_data = [json.loads(obj.data) for obj in debt_data_isPayment]
+        debt += [jdata['total_price'] for jdata in json_data if jdata['isPayment'] == False]
+        debt_dates += [obj.date for obj in debt_data_isPayment if json.loads(obj.data)['isPayment'] == False]
 
     paid_transactions = pd.DataFrame(data = {
         'Paid': paid,
@@ -314,7 +314,6 @@ def generate_cashflow_statement(buyer, income):
     accounts_payable = accounts_payable_summary(buyer)
 
     cashflow = accounts_payable.join(accounts_receivable, how='outer').fillna(0)
-    cashflow.index = cashflow.index.map(lambda x: x.strftime('%b %Y'))
     cashflow = cashflow.apply(negative_accounts, axis = 1)
     cashflow = cashflow.join(income, how = 'outer').fillna(0)
     cashflow['Total Cash'] = cashflow[_('Net income_Total')] - cashflow['Accounts Receivable'] + cashflow['Accounts Payable']

@@ -121,7 +121,7 @@ $(document).ready(function() {
            //      }
            //  }
          ],
-         order: [[1, 'asc']],
+         // order: [[1, 'asc']],
          ordering: false,
          bPaginate: false,
          bInfo: false,
@@ -131,7 +131,7 @@ $(document).ready(function() {
          searching: false,
          responsive: true,
          scrollX: true,
-         scrollCollapse: true,
+         // scrollCollapse: true,
          // scroller: {
          //   loadingIndicator: true
          // },
@@ -180,6 +180,8 @@ $(document).ready(function() {
       if (!(this.index() in [0,1])) {
         let min = $('#start-date').datepicker('getDate');
         let max = $('#end-date').datepicker('getDate');
+        max.setMonth(max.getMonth() + 1);
+        max.setDate(0);
         let date = bY_to_date(this.header().textContent);
 
         if (
@@ -197,9 +199,11 @@ $(document).ready(function() {
 
     // and cashflow
     cashflow_table.columns().every( function() {
-      if (!(this.index() in  [0,1])) {
+      if (!(this.index() in  [0])) {
         let min = $('#start-date').datepicker('getDate');
         let max = $('#end-date').datepicker('getDate');
+        max.setMonth(max.getMonth() + 1);
+        max.setDate(0);
         let date = bY_to_date(this.header().textContent);
 
         if (
@@ -221,6 +225,8 @@ $(document).ready(function() {
           if (!(this.index() in [0,1])) {
             let min = $('#start-date').datepicker('getDate');
             let max = $('#end-date').datepicker('getDate');
+            max.setMonth(max.getMonth() + 1);
+            max.setDate(0);
             let date = bY_to_date(this.header().textContent);
 
             if (
@@ -237,9 +243,11 @@ $(document).ready(function() {
         });
 
         cashflow_table.columns().every( function() {
-          if (!(this.index() in [0,1])) {
+          if (!(this.index() in [0])) {
             let min = $('#start-date').datepicker('getDate');
             let max = $('#end-date').datepicker('getDate');
+            max.setMonth(max.getMonth() + 1);
+            max.setDate(0);
             let date = bY_to_date(this.header().textContent);
 
             if (

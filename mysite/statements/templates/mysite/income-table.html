@@ -11,7 +11,7 @@
 <table id="income-table" class="table table-striped" style="width: 100%">
   <thead>
     <tr>
-      <th style="background-color: #ffffff">{% trans "Currency:" %} {{ currency }}</th>
+      <th style="background-color: #ffffff">{% trans "Type" %} ({{ currency }})</th>
       <th style="background-color: #ffffff">{% trans "Source" %}</th>
       {% for date in income_dates %}
         <th class="dt-head-right">{{ date }}</th>
