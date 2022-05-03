@@ -43,8 +43,14 @@
   <div id="income-div" class="list-group-item pb-5">
     {% include 'mysite/income-table.html' %}
   </div>
+  <div class="income-plot">
+    {{ income_plot | safe }}
+  </div>
   <br>
   <div id="cashflow-div" class="list-group-item pb-5">
     {% include 'mysite/cashflow-table.html' %}
+  </div>
+  <div class="cashflow-plot">
+    {{ cashflow_plot | safe }}
   </div>
 </div>
