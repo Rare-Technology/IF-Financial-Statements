@@ -119,6 +119,7 @@ def home(request):
         currency = get_currency(buyer)
 
         income = income.reset_index()
+        ### make 0 line very visible !! black/emphasize 0
         income_plot = px.bar(income, x = 'date', y = 'Net income_Total').to_html()
         cashflow = cashflow.reset_index()
         cashflow_plot = px.bar(cashflow, x = 'date', y = 'Total cash from fisheries operations').to_html()

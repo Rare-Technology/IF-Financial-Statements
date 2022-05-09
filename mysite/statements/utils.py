@@ -93,8 +93,9 @@ def supplies_profit(buyer):
     """
     fishdata_expenses = FishdataExpense.objects.filter(
         buyer = buyer,
-        expense_type__in = [0, 2, 3, 4],
-        isdonation = False
+        expense_type__in = [2, 3, 4],
+        isdonation = False,
+        ispayment = False
     )
     supply_purchases = FishdataSupplypurchases.objects.filter(
         buyer = buyer,
@@ -146,16 +147,21 @@ def generate_income_statement(buyer):
     income['Revenue_Total'] = income['Revenue_Fish'] + income['Revenue_Supplies']
     income['Expenses_Total'] = income['Expenses_Fish'] + income['Expenses_Supplies']
     income['Profit_Total'] = income['Profit_Fish'] + income['Profit_Supplies']
+    # income = income.rename({
+    #     'Revenue_Fish': _('Revenue_Fish'),
+    #     'Revenue_Supplies': _('Revenue_Supplies'),
+    #     'Revenue_Total': _('Revenue_Total'),
+    #     'Expenses_Fish': _('Expenses_Fish'),
+    #     'Expenses_Supplies': _('Expenses_Supplies'),
+    #     'Expenses_Total': _('Expenses_Total'),
+    #     'Profit_Fish': _('Profit (Loss)_Fish'),
+    #     'Profit_Supplies': _('Profit (Loss)_Supplies'),
+    #     'Profit_Total': _('Net income_Total')
+    # }, axis = 1)
     income = income.rename({
-        'Revenue_Fish': _('Revenue_Fish'),
-        'Revenue_Supplies': _('Revenue_Supplies'),
-        'Revenue_Total': _('Revenue_Total'),
-        'Expenses_Fish': _('Expenses_Fish'),
-        'Expenses_Supplies': _('Expenses_Supplies'),
-        'Expenses_Total': _('Expenses_Total'),
-        'Profit_Fish': _('Profit (Loss)_Fish'),
-        'Profit_Supplies': _('Profit (Loss)_Supplies'),
-        'Profit_Total': _('Net income_Total')
+        'Profit_Fish': 'Profit (Loss)_Fish',
+        'Profit_Supplies': 'Profit (Loss)_Supplies',
+        'Profit_Total': 'Net income_Total'
     }, axis = 1)
 
     return income
@@ -178,18 +184,21 @@ def accounts_receivable_summary(buyer):
 
     owed = []
     owed_dates = []
-    # loan_terms = ['loan', 'prestamo', 'pinjaman']
-    # # keep only the rows that are related to loans i.e. have 'loan' or translations in the `note` field
-    # owed_data_filter = []
-    # # this is not very elegant but can't have these conditionals in one line when notes
-    # # is None since .lower() cannot be used on None
-    # for obj in owed_data:
-    #     if obj.notes is not None:
-    #         if any(term for term in loan_terms if term in obj.notes.lower()):
-    #             owed_data_filter.append(obj)
+    loan_terms = ['loan', 'prestamo', 'pinjaman']
+    # Among the objects with expense_type = 1 (cash payments/loans issued), keep only the
+    # objects that are related to loans i.e. have 'loan' or translations in the `note` field
+    owed_data_filter = []
+    # this is not very elegant but can't have these conditionals in one line when notes
+    # is None since .lower() cannot be used on None
+    for obj in owed_data:
+        if obj.expense_type == 1 and obj.notes is not None:
+            if any(term for term in loan_terms if term in obj.notes.lower()):
+                owed_data_filter.append(obj)
+        elif obj.expense_type != 1:
+            owed_data_filter.append(obj)
     if len(owed_data) > 0:
-        owed = [obj.total_price for obj in owed_data]#_filter]
-        owed_dates = [obj.date for obj in owed_data]#_filter]
+        owed = [obj.total_price for obj in owed_data_filter]
+        owed_dates = [obj.date for obj in owed_data_filter]
 
     received = []
     received_dates = []
@@ -229,10 +238,11 @@ def accounts_receivable_summary(buyer):
     return summary
 
 def accounts_payable_summary(buyer):
+    # Add payments made w/ supplies
     debt_data = FishdataCatch.objects.filter(buyer = buyer)
     paid_data = FishdataExpense.objects.filter(
         buyer = buyer,
-        expense_type = 1 # cash for fish and loans
+        expense_type__in = [1, 2, 3, 4] # cash for fish and loans
     )
 
     paid = []
@@ -242,11 +252,13 @@ def accounts_payable_summary(buyer):
         # remove rows which represent issuing loans
         paid_data_filter = []
         for obj in paid_data:
-            if obj.notes is None:
-                paid_data_filter.append(obj)
-            else:
+            if obj.expense_type == 1 and obj.notes is not None: # cash payments w/ a memo
                 if not any(term for term in loan_terms if term in obj.notes.lower()):
                     paid_data_filter.append(obj)
+            elif obj.expense_type == 1: # cash payments w/ no memo
+                paid_data_filter.append(obj)
+            elif obj.ispayment == True: # supply payments
+                paid_data_filter.append(obj)
         paid += [obj.total_price for obj in paid_data_filter]
         paid_dates += [obj.date for obj in paid_data_filter]
     debt = []
@@ -316,13 +328,13 @@ def generate_cashflow_statement(buyer, income):
     cashflow = accounts_payable.join(accounts_receivable, how='outer').fillna(0)
     cashflow = cashflow.apply(negative_accounts, axis = 1)
     cashflow = cashflow.join(income, how = 'outer').fillna(0)
-    cashflow['Total Cash'] = cashflow[_('Net income_Total')] - cashflow['Accounts Receivable'] + cashflow['Accounts Payable']
-    cashflow = cashflow[[_('Net income_Total'), 'Accounts Receivable', 'Accounts Payable', 'Total Cash']]
+    cashflow['Total Cash'] = cashflow['Net income_Total'] - cashflow['Accounts Receivable'] + cashflow['Accounts Payable']
+    cashflow = cashflow[['Net income_Total', 'Accounts Receivable', 'Accounts Payable', 'Total Cash']]
     cashflow = cashflow.rename({
-        _('Net income_Total'): _('Net income'),
-        'Accounts Receivable': _('Changes in accounts receivable'),
-        'Accounts Payable': _('Changes in accounts payable'),
-        'Total Cash': _('Total cash from fisheries operations')
+        'Net income_Total': 'Net income',
+        'Accounts Receivable': 'Changes in accounts receivable',
+        'Accounts Payable': 'Changes in accounts payable',
+        'Total Cash': 'Total cash from fisheries operations'
     }, axis = 1)
 
     return cashflow

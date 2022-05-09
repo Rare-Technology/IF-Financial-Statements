@@ -4,7 +4,9 @@
   <link rel="stylesheet" href="{% static 'css/data-table.css' %}">
 </head>
 
-<h1 style="text-align: center">{% trans "Cash flow statement from fisheries operations" %}</h1>
+<div style = "display: flex; align-items: center; justify-content: center">
+  <span class="h1 me-2">{% trans "Cash flow statement from fisheries operations" %}</span><span class="tooltipster" data-tooltip-content="#cashflow-table-tooltip"><i class="fa fa-question-circle-o fa-2xs" style="cursor: pointer"></i></span>
+</div>
 <div class="lead" style="text-align: center">
   {{ user.first_name }} {{ user.last_name }}, <span class="start-date-display"></span> - <span class="end-date-display"></span>
 </div>
@@ -20,7 +22,16 @@
   <tbody>
     {% for row in cashflow_table %}
     <tr>
-      <td style="width: 100px">{{ row.metric }}</td>
+      <td style="width: 200px">
+        <span class="me-2">{% trans row.metric %}</span>
+        {% if row.metric == "Changes in accounts receivable" %}
+          <span class="tooltipster" data-tooltip-content="#accounts-receivable-tooltip"><i class="fa fa-question-circle-o" style="cursor: pointer"></i></span>
+        {% elif row.metric == "Changes in accounts payable" %}
+          <span class="tooltipster" data-tooltip-content="#accounts-payable-tooltip"><i class="fa fa-question-circle-o" style="cursor: pointer"></i></span>
+        {% elif row.metric == "Total cash from fisheries operations" %}
+          <span class="tooltipster" data-tooltip-content="#total-cash-tooltip"><i class="fa fa-question-circle-o" style="cursor: pointer"></i></span>
+        {% endif %}
+      </td>
       {% for x in row.data %}
         <td class="dt-body-right"> {{ x }}</td>
       {% endfor %}

@@ -27,16 +27,16 @@ msgid "Indonesian"
 msgstr "Bahasa Indonesia"
 
 #: statements/templates/mysite/fs-accordion-body.html:12
-msgid "Income statement"
-msgstr "Laporan Untung Rugi"
+msgid "Income/P&L statement from fisheries operations"
+msgstr "Laporan Untung Rugi dari Bisnis Perikanan"
 
 #: statements/templates/mysite/fs-accordion-body.html:13
 msgid "Shows your profit and loss over a set period of time."
 msgstr "Menampilkan keuntungan atau kerugian Anda pada periode yang dipilih."
 
 #: statements/templates/mysite/fs-accordion-body.html:19
-msgid "Cash Flow statement"
-msgstr "Laporan Arus Kas (Uang Masuk dan Uang Keluar)"
+msgid "Cash flow statement from fisheries operations"
+msgstr "Laporan Arus Kas dari Bisnis Perikanan"
 
 #: statements/templates/mysite/fs-accordion-body.html:20
 msgid "Shows how much cash is generated and used over a set period of time."
@@ -123,8 +123,8 @@ msgstr ""
 
 #: statements/templates/mysite/help-accordion-body.html:29
 #: statements/utils.py:265
-msgid "Accounts receivable"
-msgstr "Piutang"
+msgid "Changes in accounts receivable"
+msgstr "Kenaikan/Penurunan Piutang"
 
 #: statements/templates/mysite/help-accordion-body.html:30
 msgid ""
@@ -140,8 +140,8 @@ msgstr ""
 
 #: statements/templates/mysite/help-accordion-body.html:33
 #: statements/utils.py:266
-msgid "Accounts payable"
-msgstr "Hutang"
+msgid "Changes in accounts payable"
+msgstr "Kenaikan/Penurunan Hutang"
 
 #: statements/templates/mysite/help-accordion-body.html:34
 msgid ""
@@ -157,8 +157,8 @@ msgstr ""
 
 #: statements/templates/mysite/help-accordion-body.html:37
 #: statements/utils.py:267
-msgid "Total cash"
-msgstr "Saldo akhir"
+msgid "Total cash from fisheries operations"
+msgstr "Total Uang dari Bisnis Perikanan"
 
 #: statements/templates/mysite/help-accordion-body.html:38
 msgid ""
@@ -227,40 +227,20 @@ msgid "Sign in"
 msgstr "Masuk"
 
 #: statements/utils.py:136
-msgid "Revenue_Fish"
-msgstr "Pemasukan_Ikan"
+msgid "Fish"
+msgstr "Ikan"
 
 #: statements/utils.py:137
-msgid "Revenue_Supplies"
-msgstr "Pemasukan_Persediaan Barang"
+msgid "Supplies"
+msgstr "Persediaan Barang"
 
 #: statements/utils.py:138
-msgid "Revenue_Total"
-msgstr "Pemasukan_Total"
-
-#: statements/utils.py:139
-msgid "Expenses_Fish"
-msgstr "Pengeluaran_Ikan"
-
-#: statements/utils.py:140
-msgid "Expenses_Supplies"
-msgstr "Pengeluaran_Persediaan Barang"
-
-#: statements/utils.py:141
-msgid "Expenses_Total"
-msgstr "Pengeluaran_Total"
+msgid "Total"
+msgstr "Total"
 
 #: statements/utils.py:142
-msgid "Profit (Loss)_Fish"
-msgstr "Untung (Rugi)_Ikan"
-
-#: statements/utils.py:143
-msgid "Profit (Loss)_Supplies"
-msgstr "Untung (Rugi)_Persediaan Barang"
-
-#: statements/utils.py:144
-msgid "Net income_Total"
-msgstr "Pemasukan Bersih_Total"
+msgid "Profit (Loss)"
+msgstr "Untung (Rugi)"
 
 #: statements/utils.py:315
 msgid "Jan"
