@@ -43,14 +43,82 @@
   <div id="income-div" class="list-group-item pb-5">
     {% include 'mysite/income-table.html' %}
   </div>
-  <div class="income-plot">
-    {{ income_plot | safe }}
+  <div id="income-plot">
   </div>
   <br>
   <div id="cashflow-div" class="list-group-item pb-5">
     {% include 'mysite/cashflow-table.html' %}
   </div>
-  <div class="cashflow-plot">
-    {{ cashflow_plot | safe }}
+  <div id="cashflow-plot">
   </div>
 </div>
+<script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+<script>
+  const months_plot = {
+    'Jan': '01',
+    'Feb': '02',
+    'Mar': '03',
+    'Apr': '04',
+    'May': '05',
+    'Jun': '06',
+    'Jul': '07',
+    'Aug': '08',
+    'Sep': '09',
+    'Oct': '10',
+    'Nov': '11',
+    'Dec': '12'
+  };
+  function bY_to_date_plot (date) {
+    const date_split = date.split(' '); // ['Jan', 2022]
+    let isodate = [date_split[1], months_plot[date_split[0]], '01'].join('-'); // 2022-01-01
+    isodate = [isodate, '00:00:00'].join(' ');
+    return isodate;
+  }
+
+  let income_data = JSON.parse("{{income_json | escapejs}}");
+  let cashflow_data = JSON.parse("{{cashflow_json | escapejs}}");
+
+  let income_x = [];
+  let income_y = [];
+  let cashflow_x = [];
+  let cashflow_y = [];
+
+  end_date = new Date();
+  end_date.setDate(1);
+  end_date.setHours(0, 0, 0, 0); // HH:mm:ss:ms = 00:00:00:00
+  let start_date = new Date(end_date);
+  start_date.setMonth(end_date.getMonth() - 6);
+
+  for (let i = 0; i < income_data.length; i++) {
+    let obj = income_data[i];
+    let isodate = bY_to_date_plot(income_data[i]['date']);
+    let js_date = new Date(isodate);
+    if (start_date <= js_date && js_date <= end_date) {
+      income_x.push(bY_to_date_plot(obj['date']));
+      income_y.push(obj['Net income']);
+    };
+  };
+  let income_plot_data = [{
+    x: income_x,
+    y: income_y,
+    type: 'bar'
+  }];
+
+  for (i = 0; i < cashflow_data.length; i++) {
+    let obj = cashflow_data[i];
+    let isodate = bY_to_date_plot(cashflow_data[i]['date']);
+    let js_date = new Date(isodate);
+    if (start_date <= js_date && js_date <= end_date) {
+      cashflow_x.push(bY_to_date_plot(obj['date']));
+      cashflow_y.push(obj['Total cash from fisheries operations']);
+    };
+  };
+  let cashflow_plot_data = [{
+    x: cashflow_x,
+    y: cashflow_y,
+    type: 'bar'
+  }];
+
+  Plotly.newPlot('income-plot', income_plot_data);
+  Plotly.newPlot('cashflow-plot', cashflow_plot_data);
+</script>
