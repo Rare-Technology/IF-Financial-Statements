@@ -24,7 +24,11 @@
     {% for row in income_table %}
     <tr>
       <td>
-        <span class="me-2">{% trans row.metric %}</span>
+        {% if row.metric == 'Net income' %}
+          <span class="me-2" style="font-weight: bold">{% trans row.metric %}</span>
+        {% else %}
+          <span class="me-2">{% trans row.metric %}</span>
+        {% endif %}
         {% if row.metric == 'Revenue' and row.source == 'Fish' %}
           <span class="tooltipster" data-tooltip-content="#revenue-tooltip"><i class="fa fa-question-circle-o fa-2xs" style="cursor: pointer"></i></span>
         {% elif row.metric == 'Expenses' and row.source == 'Fish' %}
@@ -37,7 +41,13 @@
       </td>
       <td>{% trans row.source %}</td>
       {% for x in row.data %}
-        <td class="dt-body-right"> {{ x }}</td>
+        {% if row.metric == 'Expenses' %}
+          <td class="dt-body-right" style="color: red; border-color: black"> {{ x }}</td>
+        {% elif row.metric == 'Net income' %}
+          <td class="dt-body-right" style="font-weight: bold"> {{ x }}</td>
+        {% else %}
+          <td class="dt-body-right"> {{ x }}</td>
+        {% endif %}
       {% endfor %}
     </tr>
     {% endfor %}

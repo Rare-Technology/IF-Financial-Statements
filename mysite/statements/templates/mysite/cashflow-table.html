@@ -23,7 +23,11 @@
     {% for row in cashflow_table %}
     <tr>
       <td style="width: 200px">
-        <span class="me-2">{% trans row.metric %}</span>
+        {% if row.metric == "Total cash from fisheries operations" %}
+          <span class="me-2" style="font-weight: bold">{% trans row.metric %}</span>
+        {% else %}
+          <span class="me-2">{% trans row.metric %}</span>
+        {% endif %}
         {% if row.metric == "Changes in accounts receivable" %}
           <span class="tooltipster" data-tooltip-content="#accounts-receivable-tooltip"><i class="fa fa-question-circle-o" style="cursor: pointer"></i></span>
         {% elif row.metric == "Changes in accounts payable" %}
@@ -33,7 +37,11 @@
         {% endif %}
       </td>
       {% for x in row.data %}
-        <td class="dt-body-right"> {{ x }}</td>
+        {% if row.metric == 'Total cash from fisheries operations' %}
+          <td class="dt-body-right" style="font-weight: bold"> {{ x }}</td>
+        {% else %}
+          <td class="dt-body-right"> {{ x }}</td>
+        {% endif %}
       {% endfor %}
     </tr>
     {% endfor %}
