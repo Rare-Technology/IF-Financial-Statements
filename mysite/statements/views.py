@@ -141,9 +141,11 @@ def home(request):
             'income_table': income_table,
             'income_dates': income_dates,
             'income_json': income_json,
+            'net_income': _('Net income'),
             'cashflow_table': cashflow_table,
             'cashflow_dates': cashflow_dates,
             'cashflow_json': cashflow_json,
+            'total_cash': _('Total cash from fisheries operations'),
             'currency': currency,
             'help': help
         }

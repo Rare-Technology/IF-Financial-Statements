@@ -30,6 +30,8 @@ def fish_profit(buyer):
     """Calculate profit from fish transactions.
 
     fish profit = fish revenue - fish cost
+    fish revenue = fish sold
+    fish cost = fish bought or received as payment (these are essentially fish paid with a loan given to the fisher)
 
     Using transaction data from FishdataFishinventory.
 
@@ -89,7 +91,7 @@ def supplies_profit(buyer):
     buyer -- FishdataBuyer object
 
     Returns:
-    supplies_income -- Dictionary containing revenue, costs, and profit
+    supplies_income -- DataFrame containing revenue, costs, and profit
     """
     fishdata_expenses = FishdataExpense.objects.filter(
         buyer = buyer,
@@ -138,6 +140,115 @@ def supplies_profit(buyer):
 
     return supplies_income
 
+def supplies_inventory(buyer):
+    """Keep track of supplies
+
+    supply inventory = supplies in - supplies out
+    supplies in = supplies bought (equivelent to expenses from supplies_profit)
+    supplies out = supplies sold + supplies used as payment + supplies donated
+
+    Arguments:
+    buyer -- FishdataBuyer object
+
+    Returns:
+    supply_inventory -- Dataframe containing supply inventory
+    """
+    supply_purchases = FishdataSupplypurchases.objects.filter(
+        buyer = buyer,
+        type_of_supply__in = [0, 1, 2]
+    )
+    fishdata_expenses = FishdataExpense.objects.filter(
+        buyer = buyer,
+        expense_type__in = [2, 3, 4],
+    ) # includes supplies sold, used as payment (ispayment = True), and donated (isdonation = True)
+
+    supplies_in = []
+    supplies_in_date = []
+    if len(supply_purchases) > 0:
+        supplies_in = [obj.total_paid_amount for obj in supply_purchases]
+        supplies_in_date = [obj.purchase_date for obj in supply_purchases]
+
+    supplies_out = []
+    supplies_out_date = []
+    if len(fishdata_expenses) > 0:
+        supplies_out = [obj.total_price for obj in fishdata_expenses]
+        supplies_out_date = [obj.date for obj in fishdata_expenses]
+
+    supplies_in_transactions = {
+        'date': supplies_in_date,
+        'Supplies in': supplies_in
+    }
+    supplies_out_transactions = {
+        'date': supplies_out_date,
+        'Supplies out': supplies_out
+    }
+    supplies_in_transactions = pd.DataFrame(data = supplies_in_transactions)
+    supplies_out_transactions = pd.DataFrame(data = supplies_out_transactions)
+
+    supplies_in_transactions['date'] = supplies_in_transactions['date'].apply(lambda x: x.date().replace(day = 1))
+    supplies_out_transactions['date'] = supplies_out_transactions['date'].apply(lambda x: x.date().replace(day = 1))
+
+    supplies_in = supplies_in_transactions.groupby(by = 'date').sum()
+    supplies_out = supplies_out_transactions.groupby(by = 'date').sum()
+    supplies_in['Supplies in'] = -supplies_in['Supplies in']
+
+    supplies = supplies_in.join(supplies_out, how='outer').fillna(0)
+    supplies['Supply inventory'] = supplies['Supplies in'] - supplies['Supplies out']
+
+    return supplies['Supply inventory']
+
+def fish_inventory(buyer):
+    """Keep track of fish inventory
+
+    supply inventory = fish in - fish out
+    fish in = fish bought or received as payment
+    fish out = fish sold
+
+    Arguments:
+    buyer -- FishdataBuyer object
+
+    Returns:
+    fish -- Dataframe containing supply inventory
+    """
+    fish_catch = FishdataCatch.objects.filter(buyer = buyer)
+    fish_sales = FishdataFishsales.objects.filter(buyer = buyer)
+
+    supplies_in = []
+    supplies_in_date = []
+    if len(supply_purchases) > 0:
+        supplies_in = [obj.total_paid_amount for obj in supply_purchases]
+        supplies_in_date = [obj.purchase_date for obj in supply_purchases]
+
+    supplies_out = []
+    supplies_out_date = []
+    if len(fishdata_expenses) > 0:
+        supplies_out = [obj.total_price for obj in fishdata_expenses]
+        supplies_out_date = [obj.date for obj in fishdata_expenses]
+
+    supplies_in_transactions = {
+        'date': supplies_in_date,
+        'Supplies in': supplies_in
+    }
+    supplies_out_transactions = {
+        'date': supplies_out_date,
+        'Supplies out': supplies_out
+    }
+    supplies_in_transactions = pd.DataFrame(data = supplies_in_transactions)
+    supplies_out_transactions = pd.DataFrame(data = supplies_out_transactions)
+
+    supplies_in_transactions['date'] = supplies_in_transactions['date'].apply(lambda x: x.date().replace(day = 1))
+    supplies_out_transactions['date'] = supplies_out_transactions['date'].apply(lambda x: x.date().replace(day = 1))
+
+    supplies_in = supplies_in_transactions.groupby(by = 'date').sum()
+    supplies_out = supplies_out_transactions.groupby(by = 'date').sum()
+    supplies_in['Supplies in'] = -supplies_in['Supplies in']
+
+    supplies = supplies_in.join(supplies_out, how='outer').fillna(0)
+    supplies['Supply inventory'] = supplies['Supplies in'] - supplies['Supplies out']
+
+    return supplies['Supply inventory']
+
+
 def generate_income_statement(buyer):
     """ Use fish_profit and supplies_profit to produce a dictionary of figures """
     fish_income = fish_profit(buyer)
@@ -147,21 +258,11 @@ def generate_income_statement(buyer):
     income['Revenue_Total'] = income['Revenue_Fish'] + income['Revenue_Supplies']
     income['Expenses_Total'] = income['Expenses_Fish'] + income['Expenses_Supplies']
     income['Profit_Total'] = income['Profit_Fish'] + income['Profit_Supplies']
-    # income = income.rename({
-    #     'Revenue_Fish': _('Revenue_Fish'),
-    #     'Revenue_Supplies': _('Revenue_Supplies'),
-    #     'Revenue_Total': _('Revenue_Total'),
-    #     'Expenses_Fish': _('Expenses_Fish'),
-    #     'Expenses_Supplies': _('Expenses_Supplies'),
-    #     'Expenses_Total': _('Expenses_Total'),
-    #     'Profit_Fish': _('Profit (Loss)_Fish'),
-    #     'Profit_Supplies': _('Profit (Loss)_Supplies'),
-    #     'Profit_Total': _('Net income_Total')
-    # }, axis = 1)
+
     income = income.rename({
         'Profit_Fish': 'Profit (Loss)_Fish',
         'Profit_Supplies': 'Profit (Loss)_Supplies',
-        'Profit_Total': 'Net income_Total'
+        'Profit_Total': 'Net income_Total',
     }, axis = 1)
 
     return income
@@ -324,17 +425,19 @@ def generate_cashflow_statement(buyer, income):
     """ Calculate accounts receivable/payable and produce dictionary of figures """
     accounts_receivable = accounts_receivable_summary(buyer)
     accounts_payable = accounts_payable_summary(buyer)
+    supplies = supplies_inventory(buyer)
 
-    cashflow = accounts_payable.join(accounts_receivable, how='outer').fillna(0)
+    cashflow = accounts_payable.join(accounts_receivable, how='outer')
     cashflow = cashflow.apply(negative_accounts, axis = 1)
-    cashflow = cashflow.join(income, how = 'outer').fillna(0)
+    cashflow = cashflow.join(income, how = 'outer').join(supplies, how = 'outer').fillna(0)
     cashflow['Total Cash'] = cashflow['Net income_Total'] - cashflow['Accounts Receivable'] + cashflow['Accounts Payable']
-    cashflow = cashflow[['Net income_Total', 'Accounts Receivable', 'Accounts Payable', 'Total Cash']]
+    cashflow = cashflow[['Net income_Total', 'Accounts Receivable', 'Accounts Payable', 'Total Cash', 'Supply inventory']]
     cashflow = cashflow.rename({
         'Net income_Total': 'Net income',
         'Accounts Receivable': 'Changes in accounts receivable',
         'Accounts Payable': 'Changes in accounts payable',
-        'Total Cash': 'Total cash from fisheries operations'
+        'Total Cash': 'Total cash from fisheries operations',
+        'Supply inventory': 'Changes in supply inventory'
     }, axis = 1)
 
     return cashflow

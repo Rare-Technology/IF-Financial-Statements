@@ -77,6 +77,9 @@
 
   let income_data = JSON.parse("{{income_json | escapejs}}");
   let cashflow_data = JSON.parse("{{cashflow_json | escapejs}}");
+  let net_income = "{{net_income | escapejs}}";
+  let total_cash = "{{total_cash | escapejs}}";
+  let currency = "{{currency | escapejs}}";
 
   let income_x = [];
   let income_y = [];
@@ -91,18 +94,22 @@
 
   for (let i = 0; i < income_data.length; i++) {
     let obj = income_data[i];
-    let isodate = bY_to_date_plot(income_data[i]['date']);
+    let isodate = bY_to_date_plot(obj['date']);
     let js_date = new Date(isodate);
     if (start_date <= js_date && js_date <= end_date) {
-      income_x.push(bY_to_date_plot(obj['date']));
-      income_y.push(obj['Net income']);
+      income_x.push(isodate);
+      income_y.push(obj[net_income]);
     };
   };
+
   let income_plot_data = [{
     x: income_x,
     y: income_y,
     type: 'bar'
   }];
+  income_plot_layout = {
+    title:  net_income + ' (' + currency + ')'
+  };
 
   for (i = 0; i < cashflow_data.length; i++) {
     let obj = cashflow_data[i];
@@ -110,15 +117,24 @@
     let js_date = new Date(isodate);
     if (start_date <= js_date && js_date <= end_date) {
       cashflow_x.push(bY_to_date_plot(obj['date']));
-      cashflow_y.push(obj['Total cash from fisheries operations']);
+      cashflow_y.push(obj[total_cash]);
     };
   };
+
   let cashflow_plot_data = [{
     x: cashflow_x,
     y: cashflow_y,
     type: 'bar'
   }];
+  cashflow_plot_layout = {
+    title: total_cash + ' (' + currency + ')'
+  };
 
-  Plotly.newPlot('income-plot', income_plot_data);
-  Plotly.newPlot('cashflow-plot', cashflow_plot_data);
+  let removed_modebuttons = [
+    'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d',
+    'zoomOut2d', 'autoScale2d', 'resetScale2d'
+  ];
+
+  Plotly.newPlot('income-plot', income_plot_data, income_plot_layout, {modeBarButtonsToRemove: removed_modebuttons});
+  Plotly.newPlot('cashflow-plot', cashflow_plot_data, cashflow_plot_layout, {modeBarButtonsToRemove: removed_modebuttons});
 </script>

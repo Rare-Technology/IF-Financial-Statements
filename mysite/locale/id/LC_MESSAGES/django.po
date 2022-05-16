@@ -28,7 +28,7 @@ msgstr "Bahasa Indonesia"
 
 #: statements/templates/mysite/fs-accordion-body.html:12
 msgid "Income/P&L statement from fisheries operations"
-msgstr "Laporan Untung Rugi dari Bisnis Perikanan"
+msgstr "Laporan Untung dan Rugi dari Bisnis Perikanan"
 
 #: statements/templates/mysite/fs-accordion-body.html:13
 msgid "Shows your profit and loss over a set period of time."
