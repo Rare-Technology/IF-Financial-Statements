@@ -19,7 +19,6 @@ from datetime import date
 from statements.utils import generate_income_statement, generate_cashflow_statement, format_data, get_currency, translate_date
 import json
 import numpy as np
-import plotly.express as px
 
 # Create your views here.
 def loginAccount(request):

@@ -6,11 +6,13 @@
   <link rel="stylesheet" type="text/css" href="{% static 'css/navbar.css' %}">
 </head>
 <nav class="navbar navbar-expand-lg navbar-light bg-light rounded" aria-label="navbar">
-  <div class="container-fluid">
-    <img src="{% static 'images/ff-logo-250x101.png' %}"</img>
-    <h2 class="fw-bold mx-5">OurFish Financial Statements</h2>
-    <div class="collapse navbar-collapse">
-      <ul class="navbar-nav mb-2 mb-lg-0 ms-auto me-5">
+  <div class="d-flex">
+    <div>
+      <img src="{% static 'images/ff-logo-250x101.png' %}"</img>
+      <h2 class="fw-bold ml-5">OurFish Financial Statements</h2>
+    </div>
+    <div class="collapse navbar-collapse ms-auto">
+      <ul class="navbar-nav mb-2 mb-lg-0 me-5">
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" id="language-dropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             {% translate "Language" %}
@@ -31,6 +33,7 @@
         </li>
       </ul>
     </div>
+  </div>
 
     <!-- <div class="collapse navbar-collapse" id="navbar">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -39,5 +42,4 @@
         </li>
       </ul>
     </div> -->
-  </div>
 </nav>

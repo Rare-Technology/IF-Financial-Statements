@@ -31,18 +31,18 @@ msgid "Income/P&L statement from fisheries operations"
 msgstr "Laporan Untung dan Rugi dari Bisnis Perikanan"
 
 #: statements/templates/mysite/fs-accordion-body.html:13
-msgid "Shows your profit and loss over a set period of time."
-msgstr "Menampilkan keuntungan atau kerugian Anda pada periode yang dipilih."
+msgid "Shows your profit and loss over a set period of time from fisheries operations."
+msgstr "Menampilkan keuntungan atau kerugian Anda pada periode yang dipilih dari Bisnis Perikanan."
 
 #: statements/templates/mysite/fs-accordion-body.html:19
 msgid "Cash flow statement from fisheries operations"
 msgstr "Laporan Arus Kas dari Bisnis Perikanan"
 
 #: statements/templates/mysite/fs-accordion-body.html:20
-msgid "Shows how much cash is generated and used over a set period of time."
+msgid "Shows how much cash is generated and used over a set period of time from fisheries operations."
 msgstr ""
 "Menampilkan jumlah uang tunai yang Anda terima atau keluarkan pada periode "
-"yang dipilih."
+"yang dipilih dari Bisnis Perikanan"
 
 # As in, "From March 2021 TO March 2022"
 #: statements/templates/mysite/fs-accordion-body.html:30
@@ -162,11 +162,11 @@ msgstr "Total Uang dari Bisnis Perikanan"
 
 #: statements/templates/mysite/help-accordion-body.html:38
 msgid ""
-"This is the total cash (positive or negative) currently available. It is "
+"This is the total cash (positive or negative) currently available from fisheries operations. It is "
 "calculated by subtracting the total balance of accounts receivable and "
 "accounts payable from net income."
 msgstr ""
-"Ini adalah total saldo akhir uang yang Anda miliki saat ini , baik itu plus/"
+"Ini adalah total saldo akhir uang yang Anda miliki saat ini dari Bisnis Perikanan, baik itu plus/"
 "positif atau minus/negatif. Saldo akhir didapatkan dengan cara menghitung "
 "\"Pemasukan Bersih\" dikurangi \"Total Piutang + Total Hutang\"."
 

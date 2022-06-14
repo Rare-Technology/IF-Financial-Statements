@@ -130,11 +130,11 @@
     title: total_cash + ' (' + currency + ')'
   };
 
-  let removed_modebuttons = [
-    'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d',
-    'zoomOut2d', 'autoScale2d', 'resetScale2d'
-  ];
+  // let removed_modebuttons = [
+  //   'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d',
+  //   'zoomOut2d', 'autoScale2d', 'resetScale2d'
+  // ];
 
-  Plotly.newPlot('income-plot', income_plot_data, income_plot_layout, {modeBarButtonsToRemove: removed_modebuttons});
-  Plotly.newPlot('cashflow-plot', cashflow_plot_data, cashflow_plot_layout, {modeBarButtonsToRemove: removed_modebuttons});
+  Plotly.newPlot('income-plot', income_plot_data, income_plot_layout, {staticPlot: true});
+  Plotly.newPlot('cashflow-plot', cashflow_plot_data, cashflow_plot_layout, {staticPlot: true});
 </script>

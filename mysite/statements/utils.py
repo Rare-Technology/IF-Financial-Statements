@@ -469,8 +469,8 @@ def format_data(buyer, data):
     # is used over format_decimal since it automatically truncates the decimal places
     # The `format` argument rounds values as integers
     out = format_currency(data, '', format = u'#,##0.', locale = buyer_locale)
-    if out[0] == '-': # negative
-        out = '(' + out[1:] + ')'
+    # if out[0] == '-': # negative
+    #     out = '(' + out[1:] + ')'
 
     return out
 
