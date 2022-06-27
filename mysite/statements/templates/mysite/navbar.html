@@ -32,6 +32,11 @@
             {% endfor %}
           </ul>
         </li>
+        <li class="nav-item">
+          <a id="logout" class="nav-link" style="background-color: #f8f9fa" href="{% url 'logout' %}">
+            {% trans "Log out" %}
+          </a>
+        </li>
       </ul>
     </div>
   </div>
