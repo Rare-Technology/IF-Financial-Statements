@@ -14,3 +14,17 @@ class UpdateAccountForm(UserChangeForm):
 class StatementForm(forms.Form):
     start_date = forms.DateTimeField()
     end_date = forms.DateTimeField()
+
+class EmailForm(forms.Form):
+    to_email = forms.EmailField(
+        widget = forms.EmailInput(attrs = {"class": "form-control"}),
+        required = True
+    )
+    subject = forms.CharField(
+        widget = forms.TextInput(attrs = {"class": "form-control"}),
+        required = True
+    )
+    body = forms.CharField(
+        widget = forms.Textarea(attrs = {"class": "form-control", "rows": "5"}),
+        required = True
+    )

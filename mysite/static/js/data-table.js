@@ -63,6 +63,7 @@ $(document).ready(function() {
            },
            {
              extend: 'print',
+             text: $('#print-text').text(),
              exportOptions: {
                columns: [1, ':visible']
              }
@@ -159,6 +160,7 @@ $(document).ready(function() {
            },
            {
              extend: 'print',
+             text: $('#print-text').text(),
              exportOptions: {
                columns: ':visible'
              }

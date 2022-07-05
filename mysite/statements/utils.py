@@ -504,5 +504,5 @@ def translate_date(month_year):
     month, year = [s for s in month_year.split(' ')]
     trans_month = month_translations[month]
     trans_month_year = ' '.join([trans_month, year])
-
+    
     return trans_month_year

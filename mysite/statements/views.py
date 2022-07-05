@@ -12,11 +12,11 @@ from ourfish.models import AuthUser, FishdataBuyer
 from mysite.settings import EMAIL_HOST_USER
 from xhtml2pdf import pisa
 from tempfile import TemporaryFile
-from .forms import UpdateAccountForm
+from .forms import UpdateAccountForm, EmailForm
 import csv
 import pandas as pd
 from datetime import date
-from statements.utils import generate_income_statement, generate_cashflow_statement, format_data, get_currency, translate_date
+from statements.utils import generate_income_statement, generate_cashflow_statement, format_data, get_currency, translate_date, month_translations
 import json
 import numpy as np
 
@@ -106,7 +106,7 @@ def home(request):
                 'data': col.apply(lambda x: format_data(buyer, x)).values
             } for name, col in income.items()
         ]
-        income_dates = income.index.map(lambda x: translate_date(x)).values
+        income_dates = income.reset_index()['date'].map(lambda x: translate_date(x)).values
 
         cashflow_table = [
             {
@@ -122,6 +122,7 @@ def home(request):
             'Net income_Total': _('Net income')
         }, axis = 1)
         income_json = income.to_json(orient = 'records')
+
         ### make 0 line very visible !! black/emphasize 0
         cashflow = cashflow.reset_index()
         cashflow = cashflow.rename({
@@ -148,6 +149,10 @@ def home(request):
             'currency': currency,
             'help': help
         }
+
+        request.session['income_json'] = income_json
+        request.session['cashflow_json'] = cashflow_json
+        request.session['currency'] = currency
 
         # with open('ctx.json', 'r', encoding='UTF-8') as f:
         #     ctx = json.load(f)
@@ -226,57 +231,108 @@ def export_csv(request):
 def send_email(request):
     if request.method == "POST":
         # create and send Email
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            email = EmailMessage(
+                subject = request.POST['subject'],
+                body = request.POST['body'],
+                from_email = EMAIL_HOST_USER,
+                to = [request.POST['to_email']]
+            )
 
-        email = EmailMessage(
-            "Ourfish Financial Statement",
-            "Here is your financial statement for the period from ... to ...",
-            EMAIL_HOST_USER,
-            [request.POST['get_email']]
-        )
+            # TODO rewrite this
+            # The conditionals on the next if statements look a bit weird but I prefered
+            # to write it this way rather than checking the value of eg request.POST['attach_pdf'].
+            # Without using a sneaky/hack-y trick, unchecked boxes from the form will not pass in POST
+            # and thus will raise a key value error if using request.POST['<key>'] in a conditional
+            # see this for the sneaky trick in reference https://stackoverflow.com/questions/1809494/post-unchecked-html-checkboxes
+            # if 'attach_pdf' in request.POST.keys():
+            #     context = {'data': Catches.objects.all()[:10]}
+            #     template = get_template('mysite/export_pdf.html')
+            #     html = template.render(context)
+            #
+            #     pdf_file = TemporaryFile()
+            #
+            #     pisa_status = pisa.CreatePDF(html, dest = pdf_file)
+            #
+            #     if pisa_status.err:
+            #         return HttpResponse("Something went wrong. Please try again.")
+            #
+            #     pdf_file.seek(0)
+            #     email.attach('statement.pdf', pdf_file.read(), 'application/pdf')
+            #
+            #     pdf_file.close()
+            #
+            # if 'attach_excel' in request.POST.keys():
+            #     excel_file = TemporaryFile(mode = 'w+')
+            #
+            #     writer = csv.writer(excel_file)
+            #
+            #     writer.writerow(['Date', 'Fisher', 'Total price']) # Don't forget to change this when changing data !
+            #
+            #     data = Catches.objects.all()[:10]
+            #     for row in data:
+            #         writer.writerow([row.date, row.fisher_id, row.total_price])
+            #
+            #     excel_file.seek(0)
+            #     email.attach('statement.csv', excel_file.read(), 'text/csv')
+            #
+            #     excel_file.close()
 
-        # TODO rewrite this
-        # The conditionals on the next if statements look a bit weird but I prefered
-        # to write it this way rather than checking the value of eg request.POST['attach_pdf'].
-        # Without using a sneaky/hack-y trick, unchecked boxes from the form will not pass in POST
-        # and thus will raise a key value error if using request.POST['<key>'] in a conditional
-        # see this for the sneaky trick in reference https://stackoverflow.com/questions/1809494/post-unchecked-html-checkboxes
-        if 'attach_pdf' in request.POST.keys():
-            context = {'data': Catches.objects.all()[:10]}
-            template = get_template('mysite/export_pdf.html')
-            html = template.render(context)
+            email.send(fail_silently = False)
 
-            pdf_file = TemporaryFile()
+            messages.success(request, "Your email has been sent.")
+            return redirect('/')
+    else:
+        user = request.user
+        of_user = AuthUser.objects.get(username = user.username)
+        buyer = FishdataBuyer.objects.get(user = of_user)
 
-            pisa_status = pisa.CreatePDF(html, dest = pdf_file)
+        income_json = json.loads(request.session['income_json'])
+        cashflow_json = json.loads(request.session['cashflow_json'])
+        currency = request.session['currency']
 
-            if pisa_status.err:
-                return HttpResponse("Something went wrong. Please try again.")
+        # Have to reconstruct income/cashflow dataframes since these cannot be parsed in request.session
+        income = pd.json_normalize(income_json).set_index('date')
+        income = income.rename({
+            _('Net income'): 'Net income_Total'
+        }, axis = 1)
+        cashflow = pd.json_normalize(cashflow_json).set_index('date')
+        cashflow = cashflow.rename({
+            _('Total cash from fisheries operations'): 'Total cash from fisheries operations'
+        }, axis = 1)
 
-            pdf_file.seek(0)
-            email.attach('statement.pdf', pdf_file.read(), 'application/pdf')
+        income_table = [
+            {
+                'metric': name.split('_')[0],
+                'source': name.split('_')[1],
+                'data': col.apply(lambda x: format_data(buyer, x)).values
+            } for name, col in income.items()
+        ]
+        income_dates = income.reset_index()['date'].map(lambda x: translate_date(x)).values
 
-            pdf_file.close()
+        cashflow_table = [
+            {
+                'metric': name,
+                'data': col.apply(lambda x: format_data(buyer, x)).values
+            } for name, col in cashflow.items()
+        ]
+        cashflow_dates = cashflow.index.map(lambda x: translate_date(x)).values
 
-        if 'attach_excel' in request.POST.keys():
-            excel_file = TemporaryFile(mode = 'w+')
+        form = EmailForm()
 
-            writer = csv.writer(excel_file)
+        ctx = {
+            'income_table': income_table,
+            'income_dates': income_dates,
+            'cashflow_table': cashflow_table,
+            'cashflow_dates': cashflow_dates,
+            'currency': currency,
+            'form': form
+        }
 
-            writer.writerow(['Date', 'Fisher', 'Total price']) # Don't forget to change this when changing data !
 
-            data = Catches.objects.all()[:10]
-            for row in data:
-                writer.writerow([row.date, row.fisher_id, row.total_price])
 
-            excel_file.seek(0)
-            email.attach('statement.csv', excel_file.read(), 'text/csv')
-
-            excel_file.close()
-
-        email.send(fail_silently = False)
-
-        messages.success(request, "Your email has been sent. Check your inbox shortly.")
-        return redirect("home")
+        return render(request, 'mysite/send-email.html', ctx)
 
 def print_statement(request):
     user = request.user
