@@ -53,74 +53,24 @@ $(document).ready(function() {
              exportOptions: {
                columns: [1, ':visible']
              },
-             title: "Income Statement"
+             title: "Income Statement",
+             className: "btn btn-primary"
            },
            {
              extend: 'jspdf',
              config: {
                title: "Income Statement"
-             }
+             },
+             className: "btn btn-primary"
            },
            {
              extend: 'print',
              text: $('#print-text').text(),
              exportOptions: {
                columns: [1, ':visible']
-             }
+             },
+             className: "btn btn-primary"
            },
-           // {
-           //      "text" : 'Email',
-           //      action : function(e, dt, node, conf) {
-           //          var data = income_table.buttons.exportData({
-           //              "stripHtml" : true,
-           //              "columns" : ':visible',
-           //              // "modifier" : {
-           //              //     "selected" : true
-           //              // }
-           //          });
-           //          var headerArray = data.header;
-           //          var rowsArray = data.body;
-           //          var rowItem = '';
-           //          var innerRowItem = '';
-           //
-           //          for (var h = 0, hen = rowsArray.length; h < hen; h++) {
-           //              var innerRowsArray = rowsArray[h];
-           //
-           //              for (var i = 0, ien = innerRowsArray.length; i < ien; i++) {
-           //                  var outerCount = [i];
-           //
-           //                  var checker = 'false';
-           //                  for (var j = 0, jen = headerArray.length; j < ien; j++) {
-           //                      if ( outerCount = [j] & checker == 'false') {
-           //                          checker = 'true';
-           //                          innerRowItem += headerArray[i];
-           //                      }
-           //                  }
-           //
-           //                  if (innerRowsArray[i] != '') {
-           //                      innerRowItem += ': ';
-           //                  }
-           //
-           //                  innerRowItem += innerRowsArray[i];
-           //
-           //                  if (innerRowsArray[i] != '') {
-           //                      innerRowItem += '<br>';
-           //                  }
-           //
-           //              };
-           //
-           //              innerRowItem += '<br>';
-           //
-           //          };
-           //          $('#emailForm').modal({
-           //              showClose : true,
-           //              fadeDuration : 250,
-           //              fadeDelay : 1.5
-           //          });
-           //                              // tinymce.activeEditor.execCommand('mceInsertContent', false, innerRowItem);
-           //          //$("textarea#mce-content-body").val(innerRowItem);
-           //      }
-           //  }
          ],
          // order: [[1, 'asc']],
          ordering: false,
@@ -150,20 +100,23 @@ $(document).ready(function() {
              exportOptions: {
                columns: ':visible'
              },
-             title: "Cash Flow Statement"
+             title: "Cash Flow Statement",
+             className: "btn btn-primary"
            },
            {
              extend: 'jspdf',
              config: {
                title: "Cash Flow Statement"
-             }
+             },
+             className: "btn btn-primary"
            },
            {
              extend: 'print',
              text: $('#print-text').text(),
              exportOptions: {
                columns: ':visible'
-             }
+             },
+             className: "btn btn-primary"
            }
          ],
          ordering: false,
@@ -265,6 +218,14 @@ $(document).ready(function() {
           }
         });
     });
+
+    // Remove dt-button class from button elements so bootstrap styling can show
+    document.querySelectorAll('.dt-button').forEach(btn => btn.classList.remove("dt-button"));
+
+    // Add an email button that functions as a form POST button, separate from dataTables.js functionalities
+    let email_button_html = '<button class="btn btn-primary">Send Email</button>';
+    let button_containers = document.querySelectorAll('.dt-buttons');
+    button_containers.forEach(btn_ctnr => btn_ctnr.insertAdjacentHTML('beforeend', email_button_html));
 });
 
 // TODO use this function in template to get the DataTable data and pass it

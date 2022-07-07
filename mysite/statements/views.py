@@ -19,6 +19,7 @@ from datetime import date
 from statements.utils import generate_income_statement, generate_cashflow_statement, format_data, get_currency, translate_date, month_translations
 import json
 import numpy as np
+import base64
 
 # Create your views here.
 def loginAccount(request):
@@ -178,112 +179,10 @@ def view_statement(request):
 
         return HttpResponse(income_table)
 
-def export_pdf(request):
-    template_path = 'mysite/export_pdf.html'
-
-    user = request.user
-    start_date = date.fromisoformat("2022-01-01")#request.POST.get('start-date'))
-    end_date = date.fromisoformat("2022-02-22") #request.POST.get('end-date'))
-    income = generate_income_statement(user, start_date, end_date)
-    # cashflow_statement = generate_cashflow_statement(user, start_date, end_date, income_statement)
-
-    income_table = income.to_html(classes = "table table-striped table-responsive", justify='center')
-
-    context = {'income_statement': income_table}
-
-    # Create a Django response object, and specify content_type as pdf
-    response = HttpResponse(
-        content_type = 'application/pdf',
-        headers = {'Content-Disposition': 'attachment; filename="statement.pdf"'},
-    )
-
-    # find the template and render it.
-    template = get_template(template_path)
-    html = template.render(context)
-
-    # create a pdf
-    pisa_status = pisa.CreatePDF(html, dest = response)
-
-    # if error then show some funny view
-    if pisa_status.err:
-        return HttpResponse('Error exporting pdf <pre>' + html + '</pre>')
-
-    return response
-
-def export_csv(request):
-    # Create the HttpResponse object with the appropriate CSV header.
-    response = HttpResponse(
-        content_type='text/csv',
-        headers={'Content-Disposition': 'attachment; filename="statement.csv"'},
-    )
-
-    writer = csv.writer(response)
-
-    writer.writerow(['Date', 'Fisher', 'Total price'])
-
-
-
-    for catch in Catches.objects.all()[:10]:
-        writer.writerow([catch.date, catch.fisher_id, catch.total_price])
-
-    return response
-
 def send_email(request):
-    if request.method == "POST":
-        # create and send Email
-        form = EmailForm(request.POST)
-        if form.is_valid():
-            email = EmailMessage(
-                subject = request.POST['subject'],
-                body = request.POST['body'],
-                from_email = EMAIL_HOST_USER,
-                to = [request.POST['to_email']]
-            )
-
-            # TODO rewrite this
-            # The conditionals on the next if statements look a bit weird but I prefered
-            # to write it this way rather than checking the value of eg request.POST['attach_pdf'].
-            # Without using a sneaky/hack-y trick, unchecked boxes from the form will not pass in POST
-            # and thus will raise a key value error if using request.POST['<key>'] in a conditional
-            # see this for the sneaky trick in reference https://stackoverflow.com/questions/1809494/post-unchecked-html-checkboxes
-            # if 'attach_pdf' in request.POST.keys():
-            #     context = {'data': Catches.objects.all()[:10]}
-            #     template = get_template('mysite/export_pdf.html')
-            #     html = template.render(context)
-            #
-            #     pdf_file = TemporaryFile()
-            #
-            #     pisa_status = pisa.CreatePDF(html, dest = pdf_file)
-            #
-            #     if pisa_status.err:
-            #         return HttpResponse("Something went wrong. Please try again.")
-            #
-            #     pdf_file.seek(0)
-            #     email.attach('statement.pdf', pdf_file.read(), 'application/pdf')
-            #
-            #     pdf_file.close()
-            #
-            # if 'attach_excel' in request.POST.keys():
-            #     excel_file = TemporaryFile(mode = 'w+')
-            #
-            #     writer = csv.writer(excel_file)
-            #
-            #     writer.writerow(['Date', 'Fisher', 'Total price']) # Don't forget to change this when changing data !
-            #
-            #     data = Catches.objects.all()[:10]
-            #     for row in data:
-            #         writer.writerow([row.date, row.fisher_id, row.total_price])
-            #
-            #     excel_file.seek(0)
-            #     email.attach('statement.csv', excel_file.read(), 'text/csv')
-            #
-            #     excel_file.close()
-
-            email.send(fail_silently = False)
-
-            messages.success(request, "Your email has been sent.")
-            return redirect('/')
-    else:
+    if request.method == "GET":
+        # if 'start_date' in request.POST.keys():
+        # User was sent from the home page. Set up form and attachments.
         user = request.user
         of_user = AuthUser.objects.get(username = user.username)
         buyer = FishdataBuyer.objects.get(user = of_user)
@@ -291,9 +190,12 @@ def send_email(request):
         income_json = json.loads(request.session['income_json'])
         cashflow_json = json.loads(request.session['cashflow_json'])
         currency = request.session['currency']
+        # start_date = request.POST['start_date']
+        # end_date = request.POST['end_date']
 
         # Have to reconstruct income/cashflow dataframes since these cannot be parsed in request.session
         income = pd.json_normalize(income_json).set_index('date')
+        income.to_csv('income.csv')
         income = income.rename({
             _('Net income'): 'Net income_Total'
         }, axis = 1)
@@ -330,9 +232,28 @@ def send_email(request):
             'form': form
         }
 
-
-
         return render(request, 'mysite/send-email.html', ctx)
+    else:
+        # create and send Email
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            email = EmailMessage(
+                subject = request.POST['subject'],
+                body = request.POST['body'],
+                from_email = EMAIL_HOST_USER,
+                to = [request.POST['to_email']]
+            )
+
+            if request.POST['attach_PDF']:
+                pdf_decode = base64.b64decode(request.POST['pdf_base64'])
+                email.attach('income_statement.pdf', pdf_decode, 'application/pdf')
+
+            email.send(fail_silently = False)
+
+            messages.success(request, "Your email has been sent.")
+            return redirect('/')
+    # else:
+    #     HttpResponse("Please click the Send Email button on the home page.")
 
 def print_statement(request):
     user = request.user

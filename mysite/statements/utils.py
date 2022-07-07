@@ -504,5 +504,10 @@ def translate_date(month_year):
     month, year = [s for s in month_year.split(' ')]
     trans_month = month_translations[month]
     trans_month_year = ' '.join([trans_month, year])
-    
+
     return trans_month_year
+
+def filler_function_to_add_translations_for_makemessages():
+    _('Please fill out this field.')
+    _('Please fill out this field')
+    _('Please enter an email address.')

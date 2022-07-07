@@ -10,10 +10,6 @@ doc.autoTable({
   margin: {top: 30}
 })
 
-let pdf_blob = new Blob([doc.output()], {type: 'application/pdf'});
+let pdf_base64 = btoa(doc.output());
 
-if (textFileUrl !== null) {
-  window.URL.revokeObjectURL(pdf_blob);
-}
-
-let pdf_url = window.URL.createObjectURL(pdf_blob);
+$('#id_pdf_base64').val(pdf_base64);

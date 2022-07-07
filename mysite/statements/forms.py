@@ -16,6 +16,10 @@ class StatementForm(forms.Form):
     end_date = forms.DateTimeField()
 
 class EmailForm(forms.Form):
+    attach_PDF = forms.BooleanField(
+        widget = forms.CheckboxInput(attrs = {"class": "form-check-input"}),
+        initial = True
+    )
     to_email = forms.EmailField(
         widget = forms.EmailInput(attrs = {"class": "form-control"}),
         required = True
@@ -26,5 +30,6 @@ class EmailForm(forms.Form):
     )
     body = forms.CharField(
         widget = forms.Textarea(attrs = {"class": "form-control", "rows": "5"}),
-        required = True
+        required = True,
+        initial = "Hello world!"
     )
