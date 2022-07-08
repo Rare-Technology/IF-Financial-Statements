@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-06 13:37-0400\n"
-"PO-Revision-Date: 2022-03-24 16:36+0700\n"
+"POT-Creation-Date: 2022-07-08 15:46-0400\n"
+"PO-Revision-Date: 2022-07-08 15:47-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: id\n"
@@ -41,9 +41,22 @@ msgstr "Tipe"
 msgid "To"
 msgstr "sampai"
 
-#: statements/templates/mysite/fs-accordion-body.html:30
+#: statements/templates/mysite/fs-accordion-body.html:26
+msgid "Send email"
+msgstr "Kirim email"
+
+#: statements/templates/mysite/fs-accordion-body.html:31
 msgid "View Statements"
 msgstr "Lihat laporan"
+
+#: statements/templates/mysite/fs-accordion-body.html:35
+msgid ""
+"Mobile users: Landscape view is recommended for viewing the tables. If there "
+"are many months selected, you may have to swipe the table."
+msgstr ""
+"Pengguna handphone: Untuk melihat tabel, disarankan menggunakan tampilan "
+"layar mendatar. Jika ada banyak bulan yang dipilih, Anda harus menggeser "
+"tabel ke kanan. "
 
 # As in, word/vocabulary
 #: statements/templates/mysite/help-accordion-body.html:4
@@ -126,8 +139,8 @@ msgstr ""
 "yang dipilih dari Bisnis Perikanan"
 
 #: statements/templates/mysite/help-accordion-body.html:33
-#: statements/views.py:123 statements/views.py:138 statements/views.py:145
-#: statements/views.py:200
+#: statements/views.py:123 statements/views.py:138 statements/views.py:147
+#: statements/views.py:203
 msgid "Net income"
 msgstr "Pemasukan bersih"
 
@@ -179,7 +192,7 @@ msgstr ""
 "belum membayarkannya."
 
 #: statements/templates/mysite/help-accordion-body.html:45
-#: statements/views.py:130 statements/views.py:149 statements/views.py:204
+#: statements/views.py:130 statements/views.py:151 statements/views.py:207
 msgid "Total cash from fisheries operations"
 msgstr "Total Uang dari Bisnis Perikanan"
 
@@ -300,14 +313,36 @@ msgid "Please fill out this field."
 msgstr ""
 
 #: statements/utils.py:512
-#, fuzzy
-#| msgid "Please fill out this field."
 msgid "Please fill out this field"
 msgstr ""
 
 #: statements/utils.py:513
 msgid "Please enter an email address."
 msgstr ""
+
+#: statements/utils.py:514
+msgid "Changes in supply inventory"
+msgstr "Perubahan dalam persediaan barang dagangan"
+
+#: statements/utils.py:515
+msgid "Attach PDF"
+msgstr "Lampirkan PDF"
+
+#: statements/utils.py:516
+msgid "Recipient"
+msgstr "Penerima"
+
+#: statements/utils.py:517
+msgid "Subject"
+msgstr "Perihal"
+
+#: statements/utils.py:518
+msgid "Body"
+msgstr "Badan email"
+
+#: statements/utils.py:519
+msgid "Submit"
+msgstr "Kirim"
 
 #: statements/views.py:34
 msgid "Error logging in. Please try again."
@@ -327,6 +362,10 @@ msgid ""
 "is made. If expenses are greater than revenue during the same period of "
 "time, a loss is made."
 msgstr "Untung terjadi apabila pemasukan lebih besar daripada pengeluaran."
+
+#: statements/views.py:256
+msgid "Your email has been sent."
+msgstr "Email Anda telah terkirim"
 
 #, fuzzy
 #~| msgid "Income Statement"

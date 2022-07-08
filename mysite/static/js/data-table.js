@@ -227,11 +227,3 @@ $(document).ready(function() {
     let button_containers = document.querySelectorAll('.dt-buttons');
     button_containers.forEach(btn_ctnr => btn_ctnr.insertAdjacentHTML('beforeend', email_button_html));
 });
-
-// TODO use this function in template to get the DataTable data and pass it
-// to a form. Then have export options use views with POST data.
-function getTableData(table) {
-  return table.buttons.exportData({
-    columns: ':visible'
-  });
-}

@@ -11,25 +11,25 @@ class UpdateAccountForm(UserChangeForm):
         exclude = ('password',)
     # TODO: add site language as a field
 
-class StatementForm(forms.Form):
-    start_date = forms.DateTimeField()
-    end_date = forms.DateTimeField()
-
 class EmailForm(forms.Form):
     attach_PDF = forms.BooleanField(
         widget = forms.CheckboxInput(attrs = {"class": "form-check-input"}),
-        initial = True
+        initial = True,
+        localize = True
     )
-    to_email = forms.EmailField(
+    Recipient = forms.EmailField(
         widget = forms.EmailInput(attrs = {"class": "form-control"}),
-        required = True
+        required = True,
+        localize = True
     )
     subject = forms.CharField(
         widget = forms.TextInput(attrs = {"class": "form-control"}),
-        required = True
+        required = True,
+        localize = True
     )
     body = forms.CharField(
         widget = forms.Textarea(attrs = {"class": "form-control", "rows": "5"}),
         required = True,
-        initial = "Hello world!"
+        initial = "Hello world!",
+        localize = True
     )

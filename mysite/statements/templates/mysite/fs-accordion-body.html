@@ -10,7 +10,7 @@
     <div class="container">
         <div class="col-12 col-md-4 d-grid my-2 my-md-3">
           <div class="input-daterange input-group">
-            <form action="send_email/" method="post" class="row g-3">
+            <form method="post">
               {% csrf_token %}
               <div class="col-auto">
                 <input id="start-date" class="form-control" type="text" name="start_date"/>
@@ -22,7 +22,7 @@
                 <input id="end-date" class="form-control" type="text" name="end_date"/>
               </div>
               <div class="col-auto">
-                <button class="btn btn-primary" type="submit">Send Email</button>
+                <button class="btn btn-primary" type="submit">{% trans "Send email" %}</button>
               </div>
             </form>
           </div>
@@ -31,7 +31,7 @@
         </div> -->
       </div>
       <div class="row text-muted mobile-msg">
-        Mobile users: Horizontal display is recommended for viewing the tables. If there are many months selected, you may have to swipe the table.
+        {% trans "Mobile users: Landscape view is recommended for viewing the tables. If there are many months selected, you may have to swipe the table." %}
       </div>
     </div>
   </div>
@@ -125,10 +125,10 @@
     title: total_cash + ' (' + currency + ')'
   };
 
-  // let removed_modebuttons = [
-  //   'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d',
-  //   'zoomOut2d', 'autoScale2d', 'resetScale2d'
-  // ];
+  let removed_modebuttons = [
+    'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d',
+    'zoomOut2d', 'autoScale2d', 'resetScale2d'
+  ];
 
   Plotly.newPlot('income-plot', income_plot_data, income_plot_layout, {staticPlot: true});
   Plotly.newPlot('cashflow-plot', cashflow_plot_data, cashflow_plot_layout, {staticPlot: true});

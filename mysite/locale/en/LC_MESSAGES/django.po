@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-06 13:37-0400\n"
+"POT-Creation-Date: 2022-07-08 15:46-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -40,8 +40,18 @@ msgstr ""
 msgid "To"
 msgstr ""
 
-#: statements/templates/mysite/fs-accordion-body.html:30
+#: statements/templates/mysite/fs-accordion-body.html:26
+msgid "Send email"
+msgstr ""
+
+#: statements/templates/mysite/fs-accordion-body.html:31
 msgid "View Statements"
+msgstr ""
+
+#: statements/templates/mysite/fs-accordion-body.html:35
+msgid ""
+"Mobile users: Landscape view is recommended for viewing the tables. If there "
+"are many months selected, you may have to swipe the table."
 msgstr ""
 
 #: statements/templates/mysite/help-accordion-body.html:4
@@ -115,8 +125,8 @@ msgid ""
 msgstr ""
 
 #: statements/templates/mysite/help-accordion-body.html:33
-#: statements/views.py:123 statements/views.py:138 statements/views.py:145
-#: statements/views.py:200
+#: statements/views.py:123 statements/views.py:138 statements/views.py:147
+#: statements/views.py:203
 msgid "Net income"
 msgstr ""
 
@@ -156,7 +166,7 @@ msgid ""
 msgstr ""
 
 #: statements/templates/mysite/help-accordion-body.html:45
-#: statements/views.py:130 statements/views.py:149 statements/views.py:204
+#: statements/views.py:130 statements/views.py:151 statements/views.py:207
 msgid "Total cash from fisheries operations"
 msgstr ""
 
@@ -280,6 +290,30 @@ msgstr ""
 msgid "Please enter an email address."
 msgstr ""
 
+#: statements/utils.py:514
+msgid "Changes in supply inventory"
+msgstr ""
+
+#: statements/utils.py:515
+msgid "Attach PDF"
+msgstr ""
+
+#: statements/utils.py:516
+msgid "Recipient"
+msgstr ""
+
+#: statements/utils.py:517
+msgid "Subject"
+msgstr ""
+
+#: statements/utils.py:518
+msgid "Body"
+msgstr ""
+
+#: statements/utils.py:519
+msgid "Submit"
+msgstr ""
+
 #: statements/views.py:34
 msgid "Error logging in. Please try again."
 msgstr ""
@@ -293,4 +327,8 @@ msgid ""
 "If revenue is greater than expenses during the same period of time, a profit "
 "is made. If expenses are greater than revenue during the same period of "
 "time, a loss is made."
+msgstr ""
+
+#: statements/views.py:256
+msgid "Your email has been sent."
 msgstr ""

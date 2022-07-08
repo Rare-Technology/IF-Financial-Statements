@@ -180,8 +180,8 @@ def view_statement(request):
         return HttpResponse(income_table)
 
 def send_email(request):
-    if request.method == "GET":
-        # if 'start_date' in request.POST.keys():
+    # if request.method == "POST":
+    if 'start_date' in request.POST.keys():
         # User was sent from the home page. Set up form and attachments.
         user = request.user
         of_user = AuthUser.objects.get(username = user.username)
@@ -250,10 +250,10 @@ def send_email(request):
 
             email.send(fail_silently = False)
 
-            messages.success(request, "Your email has been sent.")
+            messages.success(request, _("Your email has been sent."))
             return redirect('/')
     # else:
-    #     HttpResponse("Please click the Send Email button on the home page.")
+    #     return HttpResponse("Please click the Send Email button on the home page.")
 
 def print_statement(request):
     user = request.user
