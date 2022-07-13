@@ -180,80 +180,83 @@ def view_statement(request):
         return HttpResponse(income_table)
 
 def send_email(request):
-    if request.method == "GET":
-        # if 'start_date' in request.POST.keys():
-        # User was sent from the home page. Set up form and attachments.
-        user = request.user
-        of_user = AuthUser.objects.get(username = user.username)
-        buyer = FishdataBuyer.objects.get(user = of_user)
+    if request.method == "POST":
+        if 'start_date' in request.POST.keys():
+            # User was sent from the home page. Set up form and attachments.
+            user = request.user
+            of_user = AuthUser.objects.get(username = user.username)
+            buyer = FishdataBuyer.objects.get(user = of_user)
 
-        income_json = json.loads(request.session['income_json'])
-        cashflow_json = json.loads(request.session['cashflow_json'])
-        currency = request.session['currency']
-        # start_date = request.POST['start_date']
-        # end_date = request.POST['end_date']
+            income_json = json.loads(request.session['income_json'])
+            cashflow_json = json.loads(request.session['cashflow_json'])
+            currency = request.session['currency']
+            start_date = pd.to_datetime(request.POST['start_date'])
+            end_date = pd.to_datetime(request.POST['end_date'])
 
-        # Have to reconstruct income/cashflow dataframes since these cannot be parsed in request.session
-        income = pd.json_normalize(income_json).set_index('date')
-        income.to_csv('income.csv')
-        income = income.rename({
-            _('Net income'): 'Net income_Total'
-        }, axis = 1)
-        cashflow = pd.json_normalize(cashflow_json).set_index('date')
-        cashflow = cashflow.rename({
-            _('Total cash from fisheries operations'): 'Total cash from fisheries operations'
-        }, axis = 1)
+            # Have to reconstruct income/cashflow dataframes since these cannot be parsed in request.session
+            income = pd.json_normalize(income_json)
+            income['datetime_date'] = pd.to_datetime(income['date'])
+            income = income.query("@start_date <= datetime_date and datetime_date <= @end_date")
+            income = income.drop('datetime_date', axis = 1).set_index('date')
 
-        income_table = [
-            {
-                'metric': name.split('_')[0],
-                'source': name.split('_')[1],
-                'data': col.apply(lambda x: format_data(buyer, x)).values
-            } for name, col in income.items()
-        ]
-        income_dates = income.reset_index()['date'].map(lambda x: translate_date(x)).values
+            income = income.rename({
+                _('Net income'): 'Net income_Total'
+            }, axis = 1)
+            cashflow = pd.json_normalize(cashflow_json).set_index('date')
+            cashflow = cashflow.rename({
+                _('Total cash from fisheries operations'): 'Total cash from fisheries operations'
+            }, axis = 1)
 
-        cashflow_table = [
-            {
-                'metric': name,
-                'data': col.apply(lambda x: format_data(buyer, x)).values
-            } for name, col in cashflow.items()
-        ]
-        cashflow_dates = cashflow.index.map(lambda x: translate_date(x)).values
+            income_table = [
+                {
+                    'metric': name.split('_')[0],
+                    'source': name.split('_')[1],
+                    'data': col.apply(lambda x: format_data(buyer, x)).values
+                } for name, col in income.items()
+            ]
+            income_dates = income.reset_index()['date'].map(lambda x: translate_date(x)).values
 
-        form = EmailForm()
+            cashflow_table = [
+                {
+                    'metric': name,
+                    'data': col.apply(lambda x: format_data(buyer, x)).values
+                } for name, col in cashflow.items()
+            ]
+            cashflow_dates = cashflow.index.map(lambda x: translate_date(x)).values
 
-        ctx = {
-            'income_table': income_table,
-            'income_dates': income_dates,
-            'cashflow_table': cashflow_table,
-            'cashflow_dates': cashflow_dates,
-            'currency': currency,
-            'form': form
-        }
+            form = EmailForm()
 
-        return render(request, 'mysite/send-email.html', ctx)
+            ctx = {
+                'income_table': income_table,
+                'income_dates': income_dates,
+                'cashflow_table': cashflow_table,
+                'cashflow_dates': cashflow_dates,
+                'currency': currency,
+                'form': form
+            }
+
+            return render(request, 'mysite/send-email.html', ctx)
+        else:
+            # User submitted a POST request w/ email info. Create and send Email
+            form = EmailForm(request.POST)
+            if form.is_valid():
+                email = EmailMessage(
+                    subject = request.POST['subject'],
+                    body = request.POST['body'],
+                    from_email = EMAIL_HOST_USER,
+                    to = [request.POST['to_email']]
+                )
+
+                if request.POST['attach_PDF']:
+                    pdf_decode = base64.b64decode(request.POST['pdf_base64'])
+                    email.attach('income_statement.pdf', pdf_decode, 'application/pdf')
+
+                email.send(fail_silently = False)
+
+                messages.success(request, "Your email has been sent.")
+                return redirect('/')
     else:
-        # create and send Email
-        form = EmailForm(request.POST)
-        if form.is_valid():
-            email = EmailMessage(
-                subject = request.POST['subject'],
-                body = request.POST['body'],
-                from_email = EMAIL_HOST_USER,
-                to = [request.POST['to_email']]
-            )
-
-            if request.POST['attach_PDF']:
-                pdf_decode = base64.b64decode(request.POST['pdf_base64'])
-                email.attach('income_statement.pdf', pdf_decode, 'application/pdf')
-
-            email.send(fail_silently = False)
-
-            messages.success(request, "Your email has been sent.")
-            return redirect('/')
-    # else:
-    #     HttpResponse("Please click the Send Email button on the home page.")
+        HttpResponse("Please click the Send Email button on the home page.")
 
 def print_statement(request):
     user = request.user
