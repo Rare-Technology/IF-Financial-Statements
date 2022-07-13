@@ -198,11 +198,14 @@ def send_email(request):
             income['datetime_date'] = pd.to_datetime(income['date'])
             income = income.query("@start_date <= datetime_date and datetime_date <= @end_date")
             income = income.drop('datetime_date', axis = 1).set_index('date')
-
             income = income.rename({
                 _('Net income'): 'Net income_Total'
             }, axis = 1)
-            cashflow = pd.json_normalize(cashflow_json).set_index('date')
+
+            cashflow = pd.json_normalize(cashflow_json)
+            cashflow['datetime_date'] = pd.to_datetime(cashflow['date'])
+            cashflow = cashflow.query("@start_date <= datetime_date and datetime_date <= @end_date")
+            cashflow = cashflow.drop('datetime_date', axis = 1).set_index('date')
             cashflow = cashflow.rename({
                 _('Total cash from fisheries operations'): 'Total cash from fisheries operations'
             }, axis = 1)
@@ -247,9 +250,13 @@ def send_email(request):
                     to = [request.POST['to_email']]
                 )
 
-                if request.POST['attach_PDF']:
-                    pdf_decode = base64.b64decode(request.POST['pdf_base64'])
-                    email.attach('income_statement.pdf', pdf_decode, 'application/pdf')
+                if 'include_Income_Statement' in request.POST.keys():
+                    income_pdf_decode = base64.b64decode(request.POST['income_pdf_raw'])
+                    email.attach('income_statement.pdf', income_pdf_decode, 'application/pdf')
+
+                if 'include_Cashflow_Statement' in request.POST.keys():
+                    cashflow_pdf_decode = base64.b64decode(request.POST['cashflow_pdf_raw'])
+                    email.attach('cashflow_statement.pdf', cashflow_pdf_decode, 'application/pdf')
 
                 email.send(fail_silently = False)
 

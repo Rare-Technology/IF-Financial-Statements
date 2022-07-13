@@ -20,6 +20,16 @@ class EmailForm(forms.Form):
         widget = forms.CheckboxInput(attrs = {"class": "form-check-input"}),
         initial = True
     )
+    include_Income_Statement = forms.BooleanField(
+        widget = forms.CheckboxInput(attrs = {"class": "form-check-input"}),
+        initial = True,
+        required = False
+    )
+    include_Cashflow_Statement = forms.BooleanField(
+        widget = forms.CheckboxInput(attrs = {"class": "form-check-input"}),
+        initial = True,
+        required = False
+    )
     to_email = forms.EmailField(
         widget = forms.EmailInput(attrs = {"class": "form-control"}),
         required = True
