@@ -30,6 +30,5 @@ class EmailForm(forms.Form):
     )
     body = forms.CharField(
         widget = forms.Textarea(attrs = {"class": "form-control", "rows": "5"}),
-        required = True,
-        initial = "Hello world!"
+        required = True
     )

@@ -253,7 +253,7 @@ def send_email(request):
 
                 email.send(fail_silently = False)
 
-                messages.success(request, "Your email has been sent.")
+                messages.success(request, _("Your email has been sent."))
                 return redirect('/')
     else:
         HttpResponse("Please click the Send Email button on the home page.")
