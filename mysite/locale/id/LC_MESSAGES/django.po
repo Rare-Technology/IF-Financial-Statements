@@ -319,7 +319,7 @@ msgstr ""
 
 #: statements/utils.py:513
 msgid "Please enter an email address."
-msgstr ""
+msgstr "selamat pagi !"
 
 #: statements/utils.py:514
 msgid "Changes in supply inventory"

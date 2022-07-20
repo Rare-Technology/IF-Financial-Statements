@@ -1,6 +1,10 @@
 from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth.models import User
 from django import forms
+from django.core import validators
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext as _
+
 
 class UpdateAccountForm(UserChangeForm):
     password = None
@@ -14,6 +18,29 @@ class UpdateAccountForm(UserChangeForm):
 class StatementForm(forms.Form):
     start_date = forms.DateTimeField()
     end_date = forms.DateTimeField()
+
+class MultiEmailField(forms.CharField):
+    widget = forms.EmailInput
+    default_validators = [validators.validate_email]
+
+    def __init__(self, **kwargs):
+        super().__init__(strip = True, **kwargs)
+
+    def run_validators(self, value):
+        if value in self.empty_values:
+            return
+        errors = []
+        for v in self.validators:
+            try:
+                for val in value.split(','):
+                    val = val.strip()
+                    v(val)
+            except ValidationError as e:
+                if hasattr(e, "code") and e.code in self.error_messages:
+                    e.message = self.error_messages[e.code]
+                errors.extend(e.error_list)
+        if errors:
+            raise ValidationError(errors)
 
 class EmailForm(forms.Form):
     attach_PDF = forms.BooleanField(
@@ -30,8 +57,12 @@ class EmailForm(forms.Form):
         initial = True,
         required = False
     )
-    to_email = forms.EmailField(
-        widget = forms.EmailInput(attrs = {"class": "form-control"}),
+    to_email = MultiEmailField(
+        widget = forms.EmailInput(attrs = {
+            "class": "form-control",
+            "multiple": "",
+            "placeholder": "loans@bank1.com,loans@bank2.com"
+        }),
         required = True
     )
     subject = forms.CharField(

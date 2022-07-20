@@ -155,6 +155,7 @@ def home(request):
         request.session['cashflow_json'] = cashflow_json
         request.session['currency'] = currency
 
+        ### For offline (not on Postgres server whitelist) testing only
         # with open('ctx.json', 'r', encoding='UTF-8') as f:
         #     ctx = json.load(f)
 
@@ -183,58 +184,58 @@ def send_email(request):
     if request.method == "POST":
         if 'start_date' in request.POST.keys():
             # User was sent from the home page. Set up form and attachments.
-            user = request.user
-            of_user = AuthUser.objects.get(username = user.username)
-            buyer = FishdataBuyer.objects.get(user = of_user)
-
-            income_json = json.loads(request.session['income_json'])
-            cashflow_json = json.loads(request.session['cashflow_json'])
-            currency = request.session['currency']
-            start_date = pd.to_datetime(request.POST['start_date'])
-            end_date = pd.to_datetime(request.POST['end_date'])
-
-            # Have to reconstruct income/cashflow dataframes since these cannot be parsed in request.session
-            income = pd.json_normalize(income_json)
-            income['datetime_date'] = pd.to_datetime(income['date'])
-            income = income.query("@start_date <= datetime_date and datetime_date <= @end_date")
-            income = income.drop('datetime_date', axis = 1).set_index('date')
-            income = income.rename({
-                _('Net income'): 'Net income_Total'
-            }, axis = 1)
-
-            cashflow = pd.json_normalize(cashflow_json)
-            cashflow['datetime_date'] = pd.to_datetime(cashflow['date'])
-            cashflow = cashflow.query("@start_date <= datetime_date and datetime_date <= @end_date")
-            cashflow = cashflow.drop('datetime_date', axis = 1).set_index('date')
-            cashflow = cashflow.rename({
-                _('Total cash from fisheries operations'): 'Total cash from fisheries operations'
-            }, axis = 1)
-
-            income_table = [
-                {
-                    'metric': name.split('_')[0],
-                    'source': name.split('_')[1],
-                    'data': col.apply(lambda x: format_data(buyer, x)).values
-                } for name, col in income.items()
-            ]
-            income_dates = income.reset_index()['date'].map(lambda x: translate_date(x)).values
-
-            cashflow_table = [
-                {
-                    'metric': name,
-                    'data': col.apply(lambda x: format_data(buyer, x)).values
-                } for name, col in cashflow.items()
-            ]
-            cashflow_dates = cashflow.index.map(lambda x: translate_date(x)).values
+            # user = request.user
+            # of_user = AuthUser.objects.get(username = user.username)
+            # buyer = FishdataBuyer.objects.get(user = of_user)
+            #
+            # income_json = json.loads(request.session['income_json'])
+            # cashflow_json = json.loads(request.session['cashflow_json'])
+            # currency = request.session['currency']
+            # start_date = pd.to_datetime(request.POST['start_date'])
+            # end_date = pd.to_datetime(request.POST['end_date'])
+            #
+            # # Have to reconstruct income/cashflow dataframes since these cannot be parsed in request.session
+            # income = pd.json_normalize(income_json)
+            # income['datetime_date'] = pd.to_datetime(income['date'])
+            # income = income.query("@start_date <= datetime_date and datetime_date <= @end_date")
+            # income = income.drop('datetime_date', axis = 1).set_index('date')
+            # income = income.rename({
+            #     _('Net income'): 'Net income_Total'
+            # }, axis = 1)
+            #
+            # cashflow = pd.json_normalize(cashflow_json)
+            # cashflow['datetime_date'] = pd.to_datetime(cashflow['date'])
+            # cashflow = cashflow.query("@start_date <= datetime_date and datetime_date <= @end_date")
+            # cashflow = cashflow.drop('datetime_date', axis = 1).set_index('date')
+            # cashflow = cashflow.rename({
+            #     _('Total cash from fisheries operations'): 'Total cash from fisheries operations'
+            # }, axis = 1)
+            #
+            # income_table = [
+            #     {
+            #         'metric': name.split('_')[0],
+            #         'source': name.split('_')[1],
+            #         'data': col.apply(lambda x: format_data(buyer, x)).values
+            #     } for name, col in income.items()
+            # ]
+            # income_dates = income.reset_index()['date'].map(lambda x: translate_date(x)).values
+            #
+            # cashflow_table = [
+            #     {
+            #         'metric': name,
+            #         'data': col.apply(lambda x: format_data(buyer, x)).values
+            #     } for name, col in cashflow.items()
+            # ]
+            # cashflow_dates = cashflow.index.map(lambda x: translate_date(x)).values
 
             form = EmailForm()
 
             ctx = {
-                'income_table': income_table,
-                'income_dates': income_dates,
-                'cashflow_table': cashflow_table,
-                'cashflow_dates': cashflow_dates,
-                'currency': currency,
+                # 'income_table': income_table,
+                # 'income_dates': income_dates,
+                # 'cashflow_table': cashflow_table,
+                # 'cashflow_dates': cashflow_dates,
+                # 'currency': currency,
                 'form': form
             }
 
@@ -243,20 +244,26 @@ def send_email(request):
             # User submitted a POST request w/ email info. Create and send Email
             form = EmailForm(request.POST)
             if form.is_valid():
+                recipients = request.POST['to_email'].split(',')
+                for r in recipients:
+                    r = r.strip()
+
                 email = EmailMessage(
                     subject = request.POST['subject'],
                     body = request.POST['body'],
                     from_email = EMAIL_HOST_USER,
-                    to = [request.POST['to_email']]
+                    bcc = recipients
                 )
 
                 if 'include_Income_Statement' in request.POST.keys():
-                    income_pdf_decode = base64.b64decode(request.POST['income_pdf_raw'])
-                    email.attach('income_statement.pdf', income_pdf_decode, 'application/pdf')
+                    # income_pdf_decode = base64.b64decode(request.POST['income_pdf_raw'])
+                    # email.attach('income_statement.pdf', income_pdf_decode, 'application/pdf')
+                    email.body = '===== INCOME STATEMENT =====\n\n' + email.body
 
                 if 'include_Cashflow_Statement' in request.POST.keys():
-                    cashflow_pdf_decode = base64.b64decode(request.POST['cashflow_pdf_raw'])
-                    email.attach('cashflow_statement.pdf', cashflow_pdf_decode, 'application/pdf')
+                    # cashflow_pdf_decode = base64.b64decode(request.POST['cashflow_pdf_raw'])
+                    # email.attach('cashflow_statement.pdf', cashflow_pdf_decode, 'application/pdf')
+                    email.body = '===== CASHFLOW STATEMENT =====\n\n' + email.body
 
                 email.send(fail_silently = False)
 
