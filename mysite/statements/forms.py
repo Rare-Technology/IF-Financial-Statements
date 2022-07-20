@@ -43,18 +43,24 @@ class MultiEmailField(forms.CharField):
             raise ValidationError(errors)
 
 class EmailForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        source_table = kwargs.pop('source_table')
+        super().__init__(*args, **kwargs)
+
+        self.source_table = source_table
+        self.fields['include_Income_Statement'].initial = True if self.source_table == 'income' else False
+        self.fields['include_Cashflow_Statement'].initial = True if self.source_table == 'cashflow' else False
+
     attach_PDF = forms.BooleanField(
         widget = forms.CheckboxInput(attrs = {"class": "form-check-input"}),
         initial = True
     )
     include_Income_Statement = forms.BooleanField(
         widget = forms.CheckboxInput(attrs = {"class": "form-check-input"}),
-        initial = True,
         required = False
     )
     include_Cashflow_Statement = forms.BooleanField(
         widget = forms.CheckboxInput(attrs = {"class": "form-check-input"}),
-        initial = True,
         required = False
     )
     to_email = MultiEmailField(

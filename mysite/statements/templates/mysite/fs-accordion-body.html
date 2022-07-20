@@ -9,7 +9,7 @@
   <div class="list-group-item">
     <div class="container">
         <div class="col-12 col-md-4 d-grid my-2 my-md-3">
-            <form action="send_email/" method="post">
+            <form id="dates-form" action="send_email/" method="post">
               {% csrf_token %}
               <div class="input-daterange input-group">
               <div class="col-auto">
@@ -20,9 +20,6 @@
               </div>
               <div class="col-auto">
                 <input id="end-date" class="form-control" type="text" name="end_date"/>
-              </div>
-              <div class="col-auto">
-                <button class="btn btn-primary" type="submit">{% trans "Send Email" %}</button>
               </div>
             </div>
             </form>
