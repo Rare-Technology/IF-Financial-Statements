@@ -9,9 +9,9 @@
   <div class="list-group-item">
     <div class="container">
         <div class="col-12 col-md-4 d-grid my-2 my-md-3">
-          <div class="input-daterange input-group">
-            <form action="send_email/" method="post" class="row g-3">
+            <form id="dates-form" action="send_email/" method="post">
               {% csrf_token %}
+              <div class="input-daterange input-group">
               <div class="col-auto">
                 <input id="start-date" class="form-control" type="text" name="start_date"/>
               </div>
@@ -21,17 +21,14 @@
               <div class="col-auto">
                 <input id="end-date" class="form-control" type="text" name="end_date"/>
               </div>
-              <div class="col-auto">
-                <button class="btn btn-primary" type="submit">Send Email</button>
-              </div>
+            </div>
             </form>
-          </div>
         <!-- <div class="col-12 col-md-2 my-2 d-grid my-md-3">
           <button id="view-statements" class="btn btn-primary statement-option" target="_blank" type="button">{% trans "View Statements" %}</button>
         </div> -->
       </div>
       <div class="row text-muted mobile-msg">
-        Mobile users: Horizontal display is recommended for viewing the tables. If there are many months selected, you may have to swipe the table.
+        {% trans "Mobile users: Landscape view is recommended for viewing the tables. If there are many months selected, you may have to swipe the table." %}
       </div>
     </div>
   </div>
@@ -125,10 +122,10 @@
     title: total_cash + ' (' + currency + ')'
   };
 
-  // let removed_modebuttons = [
-  //   'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d',
-  //   'zoomOut2d', 'autoScale2d', 'resetScale2d'
-  // ];
+  let removed_modebuttons = [
+    'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d',
+    'zoomOut2d', 'autoScale2d', 'resetScale2d'
+  ];
 
   Plotly.newPlot('income-plot', income_plot_data, income_plot_layout, {staticPlot: true});
   Plotly.newPlot('cashflow-plot', cashflow_plot_data, cashflow_plot_layout, {staticPlot: true});

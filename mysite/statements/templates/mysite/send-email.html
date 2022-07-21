@@ -7,13 +7,18 @@
   {% include 'mysite/income-table.html' %}
 </div>
 
+<div id="cashflow-div" hidden>
+  {% include 'mysite/cashflow-table.html' %}
+</div>
+
 <div style="width: 50%; margin-left: auto; margin-right: auto">
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <input id="id_pdf_base64" type="text" name="pdf_base64" value="" hidden>
+    <input id="income_pdf_raw" type="text" name="income_pdf_raw" value="" hidden>
+    <input id="cashflow_pdf_raw" type="text" name="cashflow_pdf_raw" value="" hidden>
     <div class="d-grid col-6 mx-auto">
-      <button class="btn btn-primary" type="submit">Submit</button>
+      <button class="btn btn-primary" type="submit">{% trans "Submit" %}</button>
     </div>
   </form>
 </div>

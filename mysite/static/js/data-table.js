@@ -38,10 +38,11 @@ $.fn.dataTable.ext.buttons.jspdf = {
           horizontalPageBreakRepeat: 0,
           margin: {top: 30}
         })
-        doc.save('table.pdf');
+        doc.save(config.config.title);
     }
 };
 
+const user_name = $('#user-name').text()
 
 $(document).ready(function() {
     // DataTables initialisation for income
@@ -53,23 +54,24 @@ $(document).ready(function() {
              exportOptions: {
                columns: [1, ':visible']
              },
-             title: "Income Statement",
-             className: "btn btn-primary"
+             title: "Income Statement for " + user_name,
+             className: "btn btn-outline-dark"
            },
            {
              extend: 'jspdf',
              config: {
-               title: "Income Statement"
+               title: "Income Statement for " + user_name
              },
-             className: "btn btn-primary"
+             className: "btn btn-outline-dark"
            },
            {
              extend: 'print',
              text: $('#print-text').text(),
+             title: "Income Statement for " + user_name,
              exportOptions: {
                columns: [1, ':visible']
              },
-             className: "btn btn-primary"
+             className: "btn btn-outline-dark"
            },
          ],
          // order: [[1, 'asc']],
@@ -100,23 +102,24 @@ $(document).ready(function() {
              exportOptions: {
                columns: ':visible'
              },
-             title: "Cash Flow Statement",
-             className: "btn btn-primary"
+             title: "Cash Flow Statement for " + user_name,
+             className: "btn btn-outline-dark"
            },
            {
              extend: 'jspdf',
              config: {
-               title: "Cash Flow Statement"
+               title: "Cash Flow Statement for " + user_name,
              },
-             className: "btn btn-primary"
+             className: "btn btn-outline-dark"
            },
            {
              extend: 'print',
              text: $('#print-text').text(),
+             title: "Cash Flow Statement for " + user_name,
              exportOptions: {
                columns: ':visible'
              },
-             className: "btn btn-primary"
+             className: "btn btn-outline-dark"
            }
          ],
          ordering: false,
@@ -223,9 +226,12 @@ $(document).ready(function() {
     document.querySelectorAll('.dt-button').forEach(btn => btn.classList.remove("dt-button"));
 
     // Add an email button that functions as a form POST button, separate from dataTables.js functionalities
-    let email_button_html = '<button class="btn btn-primary">Send Email</button>';
-    let button_containers = document.querySelectorAll('.dt-buttons');
-    button_containers.forEach(btn_ctnr => btn_ctnr.insertAdjacentHTML('beforeend', email_button_html));
+    let income_email_button_html = '<input id="income-submit" name="income-submit" class="btn btn-outline-dark" type="submit" form="dates-form" value="Email"></input>';
+    let cashflow_email_button_html = '<input id="cashflow-submit" name="cashflow-submit" class="btn btn-outline-dark" type="submit" form="dates-form" value="Email"></input>';
+    let income_button_container = document.querySelector('#income-table_wrapper').querySelector('.dt-buttons');
+    let cashflow_button_container = document.querySelector('#cashflow-table_wrapper').querySelector('.dt-buttons');
+    income_button_container.insertAdjacentHTML('beforeend', income_email_button_html);
+    cashflow_button_container.insertAdjacentHTML('beforeend', cashflow_email_button_html);
 });
 
 // TODO use this function in template to get the DataTable data and pass it
