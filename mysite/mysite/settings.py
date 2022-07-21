@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-import configparser
 import os
 from django.utils.translation import gettext_lazy as _
 
@@ -23,14 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-cfg = configparser.ConfigParser(interpolation = None)
-cfg.read(BASE_DIR / 'mysite/secret.ini')
-SECRET_KEY = cfg.get('key', 'SECRET_KEY')
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1', '137.184.178.160', 'statements.rare.org']
 
 
 # Application definition
@@ -89,10 +86,10 @@ DATABASES = {
     },
     'ourfish': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': cfg.get('ourfish', 'name'),
-        'HOST': cfg.get('ourfish', 'host'),
-        'USER': cfg.get('ourfish', 'user'),
-        'PASSWORD': cfg.get('ourfish', 'password')
+        'NAME': os.environ['OURFISH_NAME'],
+        'HOST': os.environ['OURFISH_HOST'],
+        'USER': os.environ['OURFISH_USER'],
+        'PASSWORD': os.environ['OURFISH_PASSWORD']
     },
 }
 
@@ -174,10 +171,10 @@ LOGOUT_REDIRECT_URL = '/'
 
 # Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = cfg.get('email', 'host')
-EMAIL_PORT = cfg.get('email', 'port')
-EMAIL_HOST_USER = cfg.get('email', 'user')
-EMAIL_HOST_PASSWORD = cfg.get('email', 'password')
+EMAIL_HOST = os.environ['EMAIL_HOST']
+EMAIL_PORT = os.environ['EMAIL_PORT']
+EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 EMAIL_USE_TLS = True
 
 # AUTH_USER_MODEL = 'ourfish.AuthUser'

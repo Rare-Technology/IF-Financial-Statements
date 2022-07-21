@@ -261,16 +261,17 @@ def send_email(request):
                     bcc = recipients
                 )
 
+                user_name = request.user.first_name
                 if 'include_Income_Statement' in request.POST.keys():
                     income_pdf_decode = base64.b64decode(request.POST['income_pdf_raw'])
-                    email.attach('income_statement.pdf', income_pdf_decode, 'application/pdf')
+                    email.attach(user_name + '_Income_Statement.pdf', income_pdf_decode, 'application/pdf')
 
                     ### For offline use
                     # email.body = '===== INCOME STATEMENT =====\n\n' + email.body
 
-                if 'include_Cashflow_Statement' in request.POST.keys():
+                if 'include_Cash_Flow_Statement' in request.POST.keys():
                     cashflow_pdf_decode = base64.b64decode(request.POST['cashflow_pdf_raw'])
-                    email.attach('cashflow_statement.pdf', cashflow_pdf_decode, 'application/pdf')
+                    email.attach(user_name + '_Cash Flow_Statement.pdf', cashflow_pdf_decode, 'application/pdf')
 
                     ### For offline use
                     # email.body = '===== CASHFLOW STATEMENT =====\n\n' + email.body
@@ -280,7 +281,7 @@ def send_email(request):
                 messages.success(request, _("Your email has been sent."))
                 return redirect('/')
     else:
-        HttpResponse("Please click the Send Email button on the home page.")
+        return HttpResponse("Please click the Send Email button on the home page.<br><a href='/'>Return home</a>")
 
 def print_statement(request):
     user = request.user

@@ -13,7 +13,7 @@ income_doc.autoTable({
   margin: {top: 30}
 })
 
-cashflow_doc.text('Cashflow Statement', 120, 20);
+cashflow_doc.text('Cash Flow Statement', 120, 20);
 cashflow_doc.autoTable({
   styles: {halign: 'right'},
   columnStyles: {0: {halign: 'left'}},

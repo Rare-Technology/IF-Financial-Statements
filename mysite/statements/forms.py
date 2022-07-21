@@ -49,7 +49,7 @@ class EmailForm(forms.Form):
 
         self.source_table = source_table
         self.fields['include_Income_Statement'].initial = True if self.source_table == 'income' else False
-        self.fields['include_Cashflow_Statement'].initial = True if self.source_table == 'cashflow' else False
+        self.fields['include_Cash_Flow_Statement'].initial = True if self.source_table == 'cashflow' else False
 
     attach_PDF = forms.BooleanField(
         widget = forms.CheckboxInput(attrs = {"class": "form-check-input"}),
@@ -59,7 +59,7 @@ class EmailForm(forms.Form):
         widget = forms.CheckboxInput(attrs = {"class": "form-check-input"}),
         required = False
     )
-    include_Cashflow_Statement = forms.BooleanField(
+    include_Cash_Flow_Statement = forms.BooleanField(
         widget = forms.CheckboxInput(attrs = {"class": "form-check-input"}),
         required = False
     )
