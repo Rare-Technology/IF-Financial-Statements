@@ -17,10 +17,14 @@
     {{ form.as_p }}
     <input id="income_pdf_raw" type="text" name="income_pdf_raw" value="" hidden>
     <input id="cashflow_pdf_raw" type="text" name="cashflow_pdf_raw" value="" hidden>
+    <input id="income_excel_raw" type="text" name="income_excel_raw" value="" hidden>
+    <input id="cashflow_excel_raw" type="text" name="cashflow_excel_raw" value="" hidden>
     <div class="d-grid col-6 mx-auto">
       <button class="btn btn-primary" type="submit">{% trans "Submit" %}</button>
     </div>
   </form>
 </div>
 <script type="text/javascript" src="{% static 'js/prepare-email-pdfs.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/prepare-email-excel.js' %}"></script>
+
 {% endblock content %}

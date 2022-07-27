@@ -55,6 +55,10 @@ class EmailForm(forms.Form):
         widget = forms.CheckboxInput(attrs = {"class": "form-check-input"}),
         initial = True
     )
+    attach_Excel = forms.BooleanField(
+        widget = forms.CheckboxInput(attrs = {"class": "form-check-input"}),
+        initial = True
+    )
     include_Income_Statement = forms.BooleanField(
         widget = forms.CheckboxInput(attrs = {"class": "form-check-input"}),
         required = False

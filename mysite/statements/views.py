@@ -263,18 +263,30 @@ def send_email(request):
 
                 user_name = request.user.first_name
                 if 'include_Income_Statement' in request.POST.keys():
-                    income_pdf_decode = base64.b64decode(request.POST['income_pdf_raw'])
-                    email.attach(user_name + '_Income_Statement.pdf', income_pdf_decode, 'application/pdf')
+                    filename = user_name + '_Income_Statement'
+                    if 'attach_PDF' in request.POST.keys():
+                        income_pdf_decode = base64.b64decode(request.POST['income_pdf_raw'])
+                        email.attach(filename + '.pdf', income_pdf_decode, 'application/pdf')
+
+                    if 'attach_Excel' in request.POST.keys():
+                        income_excel_decode = base64.b64decode(request.POST['income_excel_raw'])
+                        email.attach(filename + '.xlsx', income_excel_decode, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
                     ### For offline use
                     # email.body = '===== INCOME STATEMENT =====\n\n' + email.body
 
                 if 'include_Cash_Flow_Statement' in request.POST.keys():
-                    cashflow_pdf_decode = base64.b64decode(request.POST['cashflow_pdf_raw'])
-                    email.attach(user_name + '_Cash Flow_Statement.pdf', cashflow_pdf_decode, 'application/pdf')
+                    filename = user_name + '_Cash_Flow_Statement'
+                    if 'attach_PDF' in request.POST.keys():
+                        cashflow_pdf_decode = base64.b64decode(request.POST['cashflow_pdf_raw'])
+                        email.attach(filename + '.pdf', cashflow_pdf_decode, 'application/pdf')
+                    if 'attach_Excel' in request.POST.keys():
+                        cashflow_excel_decode = base64.b64decode(request.POST['cashflow_excel_raw'])
+                        email.attach(filename + '.xlsx', cashflow_excel_decode, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
                     ### For offline use
                     # email.body = '===== CASHFLOW STATEMENT =====\n\n' + email.body
+
 
                 email.send(fail_silently = False)
 
